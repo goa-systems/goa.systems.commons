@@ -1,0 +1,84 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+}
+
+ext {	
+	junitvers = '5.7.0'
+	junitplatvers = '1.7.0' 
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+version = '0.0.1'
+
+dependencies {
+
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:' + junitvers
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:' + junitvers
+	testRuntimeOnly 'org.junit.platform:junit-platform-console-standalone:' + junitplatvers
+
+	implementation 'org.slf4j:slf4j-api:1.7.30'
+	testRuntimeOnly 'ch.qos.logback:logback-core:1.2.3'
+	testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+repositories {
+
+	jcenter()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+	repositories {
+        maven {
+            url = REPO_DIR
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+        	groupId = 'goa.systems'
+        	artifactId = 'commons'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'GOA systems commons'
+                description = 'Library containing common logic.'
+                url = 'https://goa.systems/commons'
+                licenses {
+                    license {
+                        name = 'GPLv3'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'goa'
+                        name = 'Andreas Gottardi'
+                        email = 'goa@goa.systems'
+                    }
+                }
+                scm {
+                    connection = 'scm:git@github.com:andreasgottardi/goa.systems.commons.git'
+                    url = 'https://github.com/goa.systems.commons'
+                }
+            }
+        }
+    }
+}
+

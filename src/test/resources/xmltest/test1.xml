@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE root [
+	<!ELEMENT root (child) >
+	<!ELEMENT child (#PCDATA) >
+]>
+<root><child>Child content</child></root>
