@@ -82,3 +82,10 @@ publishing {
     }
 }
 
+task localPublish (type: Copy, group: 'publishing', description: 'Exports all jar files to publish') {
+	from(fileTree('build/repo') { includes }.files) {
+        include '**/*.jar'
+    }
+    into 'build/remote'
+}
+
