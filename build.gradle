@@ -37,21 +37,6 @@ java {
     withSourcesJar()
 }
 
-task localPublish (group: 'publishing', description: 'Exports all jar files to publish') {
-	
-	dependsOn publish
-	mustRunAfter publish
-    doLast {
-	    println "Starting local publish"
-		copy {
-			from(fileTree(REPO_DIR) { includes }.files) {
-		        include '**/*.jar'
-		    }
-		    into 'build/remote'
-	    }
-	}
-}
-
 publishing {
 	repositories {
         maven {
@@ -98,3 +83,19 @@ publishing {
     println "Publication done"
 }
 
+/*  This task exports the generated jar files into the directory "build/remote".
+    Build tasks can grab them from there and handle them as needed. */
+task localPublish (group: 'publishing', description: 'Exports all jar files to publish') {
+	
+	dependsOn publish
+	mustRunAfter publish
+    doLast {
+	    println "Starting local publish"
+		copy {
+			from(fileTree(REPO_DIR) { includes }.files) {
+		        include '**/*.jar'
+		    }
+		    into 'build/remote'
+	    }
+	}
+}
