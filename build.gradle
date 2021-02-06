@@ -83,6 +83,10 @@ publishing {
 }
 
 task localPublish (type: Copy, group: 'publishing', description: 'Exports all jar files to publish') {
+	
+	dependsOn publish
+	mustRunAfter publish
+	
 	from(fileTree(REPO_DIR) { includes }.files) {
         include '**/*.jar'
     }
