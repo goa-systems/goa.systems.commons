@@ -80,7 +80,6 @@ publishing {
             }
         }
     }
-    println "Publication done"
 }
 
 /*  This task exports the generated jar files into the directory "build/remote".
@@ -90,7 +89,6 @@ task localPublish (group: 'publishing', description: 'Exports all jar files to p
 	dependsOn publish
 	mustRunAfter publish
     doLast {
-	    println "Starting local publish"
 		copy {
 			from(fileTree(REPO_DIR) { includes }.files) {
 		        include '**/*.jar'
