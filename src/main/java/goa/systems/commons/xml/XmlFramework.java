@@ -1,5 +1,10 @@
 package goa.systems.commons.xml;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -8,14 +13,24 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 /**
  * This class provides generators for DocumentBuilder(Factory)s and
  * Transformer(Factory)s. Security features are applied automatically and tools
  * like <a href="https://www.sonarlint.org">SonarLint</a> do not throw warnings.
  * 
+ * <b>History</b>
+ * 
+ * <ul>
+ * <li>0.0.1: 09.10.2020 - Initial version</li>
+ * <li>0.0.2: 03.06.2021 - Document creation from string added.</li>
+ * </ul>
+ * 
  * @author Andreas Gottardi
- * @version 0.0.1
- * @since 09.10.2020
+ * @version 0.0.2
+ * @since 03.06.2021
  *
  */
 public class XmlFramework {
@@ -75,5 +90,34 @@ public class XmlFramework {
 	 */
 	public static synchronized DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
 		return getDocumentBuilderFactory().newDocumentBuilder();
+	}
+
+	/**
+	 * Creates a Document from a given XML string.
+	 * 
+	 * @param xml Source code as string.
+	 * @return Document representing the given XML source code.
+	 * @throws ParserConfigurationException in case of error.
+	 * @throws IOException                  in case of error.
+	 * @throws SAXException                 in case of error.
+	 */
+	public static synchronized Document getDocumentFromString(String xml)
+			throws SAXException, IOException, ParserConfigurationException {
+		return getDocumentFromString(xml, StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * Creates a Document from a given XML string.
+	 * 
+	 * @param xml     Source code as string.
+	 * @param charset Desired character set.
+	 * @return Document representing the given XML source code.
+	 * @throws ParserConfigurationException in case of error.
+	 * @throws IOException                  in case of error.
+	 * @throws SAXException                 in case of error.
+	 */
+	public static synchronized Document getDocumentFromString(String xml, Charset charset)
+			throws SAXException, IOException, ParserConfigurationException {
+		return getDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes(charset)));
 	}
 }

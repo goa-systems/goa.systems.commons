@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import goa.systems.commons.io.InputOutput;
 
 class XmlFrameworkTest {
 
@@ -63,6 +66,20 @@ class XmlFrameworkTest {
 			assertEquals(3, lines.length);
 			assertTrue(lines[1].startsWith("    "));
 		} catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
+			logger.error("Exception occured.", e);
+		}
+	}
+
+	@Test
+	void xmlfwTest3() {
+		try {
+			InputStream is = XmlFrameworkTest.class.getResourceAsStream("/xmltest/test1.xml");
+			String content = InputOutput.read(is);
+			Document document = XmlFramework.getDocumentFromString(content);
+			NodeList nl = document.getChildNodes();
+			assertEquals("root", nl.item(1).getNodeName());
+			assertEquals("child", nl.item(1).getFirstChild().getNodeName());
+		} catch (SAXException | IOException | ParserConfigurationException e) {
 			logger.error("Exception occured.", e);
 		}
 	}
