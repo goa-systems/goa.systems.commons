@@ -15,7 +15,7 @@ public class Validity {
 	/**
 	 * Checks if the input string is either null or empty.
 	 * 
-	 * @param input
+	 * @param input Input string to check.
 	 * @return true if input string is either null or empty.
 	 */
 	public static boolean isNullOrEmpty(String input) {
@@ -26,8 +26,8 @@ public class Validity {
 	 * Checks if only one string is set with a value. null is considered a empty
 	 * string.
 	 * 
-	 * @param str1
-	 * @param str2
+	 * @param str1 Input string to check.
+	 * @param str2 Input string to check.
 	 * @return true if only one string contains text
 	 */
 	public static boolean isOnlyOneSet(String str1, String str2) {
