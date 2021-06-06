@@ -91,6 +91,7 @@ task localPublish (group: 'publishing', description: 'Exports all jar files to p
 		copy {
 			from(fileTree(REPO_DIR) { includes }.files) {
 		        include '**/*.jar'
+		        include '**/*.pom'
 		    }
 		    into 'build/remote'
 	    }
