@@ -1,5 +1,6 @@
 package goa.systems.commons.io;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,8 +40,8 @@ public class InputOutput {
 	 * @param inputstream The input stream to read from.
 	 * @return A string containing the data.
 	 */
-	public static String read(InputStream inputstream) {
-		return read(inputstream, StandardCharsets.UTF_8);
+	public static String readString(InputStream inputstream) {
+		return readString(inputstream, StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -51,7 +52,7 @@ public class InputOutput {
 	 * @param cs          The character set to read.
 	 * @return A string containing the data.
 	 */
-	public static String read(InputStream inputstream, Charset cs) {
+	public static String readString(InputStream inputstream, Charset cs) {
 		if (inputstream != null) {
 			StringBuilder sb = new StringBuilder();
 			int read;
@@ -87,8 +88,8 @@ public class InputOutput {
 	 *                    characters will be returned.
 	 * @return The string containing maximum the number of characters specified.
 	 */
-	public static String read(InputStream inputstream, int length) {
-		return read(inputstream, length);
+	public static String readString(InputStream inputstream, int length) {
+		return readString(inputstream, length);
 	}
 
 	/**
@@ -102,7 +103,7 @@ public class InputOutput {
 	 *                    characters will be returned.
 	 * @return The string containing maximum the number of characters specified.
 	 */
-	public static String read(InputStream inputstream, Charset cs, int length) {
+	public static String readString(InputStream inputstream, Charset cs, int length) {
 		if (inputstream != null) {
 			StringBuilder sb = new StringBuilder();
 			int read;
@@ -123,6 +124,35 @@ public class InputOutput {
 		} else {
 			logger.error(IS_IS_NULL);
 			return "";
+		}
+	}
+
+	/**
+	 * Reads the given input stream into a ByteArrayOutputStream for further
+	 * handling.
+	 * 
+	 * @param inputstream
+	 * @return new ByteArrayOutputStream or null.
+	 */
+	public static ByteArrayOutputStream readByteArrayOutputStream(InputStream inputstream) {
+
+		if (inputstream != null) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			int read;
+			byte[] buffer = new byte[1024];
+			try {
+				read = inputstream.read(buffer);
+				while (read != -1) {
+					baos.write(buffer, 0, read);
+					read = inputstream.read(buffer);
+				}
+			} catch (IOException e) {
+				logger.error("IOException occured while reading the whole stream.", e);
+			}
+			return baos;
+		} else {
+			logger.error(IS_IS_NULL);
+			return null;
 		}
 	}
 }

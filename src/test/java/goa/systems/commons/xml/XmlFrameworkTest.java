@@ -74,7 +74,7 @@ class XmlFrameworkTest {
 	void xmlfwTest3() {
 		try {
 			InputStream is = XmlFrameworkTest.class.getResourceAsStream("/xmltest/test1.xml");
-			String content = InputOutput.read(is);
+			String content = InputOutput.readString(is);
 			Document document = XmlFramework.getDocumentFromString(content);
 			NodeList nl = document.getChildNodes();
 			assertEquals("root", nl.item(1).getNodeName());

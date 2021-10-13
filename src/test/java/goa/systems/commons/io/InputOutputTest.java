@@ -2,6 +2,7 @@ package goa.systems.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -28,7 +29,7 @@ class InputOutputTest {
 	 */
 	@Test
 	void ioTest1() {
-		String line1 = InputOutput.read(InputOutputTest.class.getResourceAsStream("/logback-test.xml"),
+		String line1 = InputOutput.readString(InputOutputTest.class.getResourceAsStream("/logback-test.xml"),
 				StandardCharsets.UTF_8);
 		assertEquals(813, line1.length());
 	}
@@ -40,7 +41,7 @@ class InputOutputTest {
 	@Test
 	void ioTest2() {
 		InputStream is = InputOutputTest.class.getResourceAsStream("/logback-test.xml");
-		String line1 = InputOutput.read(is, StandardCharsets.UTF_8, 55);
+		String line1 = InputOutput.readString(is, StandardCharsets.UTF_8, 55);
 		logger.debug("Line 1 of logback config: {}", line1);
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>", line1);
 		if (is != null) {
@@ -60,7 +61,7 @@ class InputOutputTest {
 	@Test
 	void ioTest3() {
 		InputStream is = InputOutputTest.class.getResourceAsStream("/iotest3.txt");
-		String line1 = InputOutput.read(is, StandardCharsets.UTF_8, 55);
+		String line1 = InputOutput.readString(is, StandardCharsets.UTF_8, 55);
 		logger.debug("Line 1 of logback config: {}", line1);
 		assertEquals(14, line1.length());
 		assertEquals("iotest3content", line1);
@@ -89,7 +90,7 @@ class InputOutputTest {
 		/* Test logic. */
 		for (int i = 0; i < chss.length; i++) {
 			InputStream is = InputOutputTest.class.getResourceAsStream("/iotest4/" + files[i]);
-			String line = InputOutput.read(is, chss[i], 55);
+			String line = InputOutput.readString(is, chss[i], 55);
 			logger.debug("Line 1 of logback config with encoding {}: {}", chss[i], line);
 			assertEquals(19, line.length());
 			assertEquals("iotest4content:öäüß", line);
@@ -101,5 +102,27 @@ class InputOutputTest {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Tests loading a file into a ByteArrayOutputStream
+	 */
+	@Test
+	void ioTest5() {
+
+		String file = "utf8.txt";
+
+		InputStream is = InputOutputTest.class.getResourceAsStream("/iotest5/" + file);
+		ByteArrayOutputStream line = InputOutput.readByteArrayOutputStream(is);
+		/* Should be 23 because the german vowels count 2 bytes. */
+		assertEquals(23, line.size());
+		if (is != null) {
+			try {
+				is.close();
+			} catch (IOException e) {
+				logger.error("IOException occured: Can not close input stream.", e);
+			}
+		}
+
 	}
 }
