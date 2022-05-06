@@ -1,9 +1,12 @@
 package goa.systems.commons.io;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -153,6 +156,61 @@ public class InputOutput {
 		} else {
 			logger.error(IS_IS_NULL);
 			return null;
+		}
+	}
+
+	/**
+	 * Writes a string to a file with default encoding of UTF-8.
+	 * 
+	 * @param str String to write.
+	 * @param f   File to write to.
+	 */
+	public static void writeString(String str, File f) {
+		try (FileOutputStream fos = new FileOutputStream(f)) {
+			writeString(str, fos);
+		} catch (IOException e) {
+			logger.error("Error writing to file", e);
+		}
+	}
+
+	/**
+	 * Writes a string to a file with a given encoding.
+	 * 
+	 * @param str String to write.
+	 * @param f   File to write to.
+	 * @param cs  Encoding to use.
+	 */
+	public static void writeString(String str, File f, Charset cs) {
+		try (FileOutputStream fos = new FileOutputStream(f)) {
+			writeString(str, fos, cs);
+		} catch (IOException e) {
+			logger.error("Error writing to file", e);
+		}
+	}
+
+	/**
+	 * Writes a string to a specified output stream with a default encoding of
+	 * UTF-8.
+	 * 
+	 * @param str String to write.
+	 * @param os  Output stream to write to.
+	 */
+	public static void writeString(String str, OutputStream os) {
+		writeString(str, os, StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * Writes a string to a specified output stream.
+	 * 
+	 * @param str String to write
+	 * @param os  Stream to write to
+	 * @param cs  Desired encoding
+	 */
+	public static void writeString(String str, OutputStream os, Charset cs) {
+		try {
+			os.write(str.getBytes(cs));
+		} catch (IOException e) {
+			logger.error("Error writing String to outputstream.", e);
 		}
 	}
 }
