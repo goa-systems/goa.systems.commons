@@ -213,4 +213,31 @@ public class InputOutput {
 			logger.error("Error writing String to outputstream.", e);
 		}
 	}
+
+	/**
+	 * Copies from the given input stream to the given output stream.
+	 * 
+	 * This method does not close the streams. They have to be closed by caller if
+	 * necessary.
+	 * 
+	 * @param is Stream to read from
+	 * @param os Stream to write to
+	 */
+	public static void copy(InputStream is, OutputStream os) {
+
+		if (is == null || os == null) {
+			return;
+		}
+		try {
+			byte[] buffer = new byte[1024];
+			int read = is.read(buffer);
+			while (read != -1) {
+				os.write(buffer, 0, read);
+				read = is.read(buffer);
+			}
+		} catch (IOException e) {
+			logger.error("Error copying streams.", e);
+		}
+
+	}
 }

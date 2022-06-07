@@ -4,8 +4,8 @@ plugins {
 }
 
 ext {	
-	junitvers = '5.7.1'
-	junitplatvers = '1.7.1' 
+	junitvers = '5.8.2'
+	junitplatvers = '1.8.2' 
 }
 
 sourceCompatibility = 1.8
@@ -18,9 +18,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:' + junitvers
 	testRuntimeOnly 'org.junit.platform:junit-platform-commons:' + junitplatvers
 
-	implementation 'org.slf4j:slf4j-api:1.7.30'
-	testRuntimeOnly 'ch.qos.logback:logback-core:1.2.3'
-	testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'
+	implementation 'org.slf4j:slf4j-api:1.7.36'
+	testRuntimeOnly 'ch.qos.logback:logback-core:1.2.11'
+	testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.11'
 }
 
 test {
