@@ -2,6 +2,7 @@ package goa.systems.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -123,6 +124,20 @@ class InputOutputTest {
 				logger.error("IOException occured: Can not close input stream.", e);
 			}
 		}
+	}
 
+	/**
+	 * Tests the simple copy method.
+	 */
+	@Test
+	void ioTest6() {
+		String sourcetext = "This is a test";
+		String destinationtext;
+		byte[] source = sourcetext.getBytes();
+		ByteArrayInputStream bais = new ByteArrayInputStream(source);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		InputOutput.copy(bais, baos);
+		destinationtext = new String(baos.toByteArray());
+		assertEquals(sourcetext, destinationtext);
 	}
 }
