@@ -7,7 +7,7 @@ env:
   ARTIFACT_VERSION: 0.3.1
 
 jobs:
-  build-comparator-app:
+  build-commons-lib:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
