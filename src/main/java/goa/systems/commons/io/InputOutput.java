@@ -134,7 +134,7 @@ public class InputOutput {
 	 * Reads the given input stream into a ByteArrayOutputStream for further
 	 * handling.
 	 * 
-	 * @param inputstream
+	 * @param inputstream Inputstream to read from
 	 * @return new ByteArrayOutputStream or null.
 	 */
 	public static ByteArrayOutputStream readByteArrayOutputStream(InputStream inputstream) {
