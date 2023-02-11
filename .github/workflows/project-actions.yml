@@ -21,6 +21,6 @@ jobs:
              -Dsonar.host.url=http://localhost:9000 \
              -Dsonar.login=sqp_53baac78b268d26f9cf42878829ebb3d726783e9
       - run: |
-             scp build/distributions/goa.systems.commons-$LIB_VERS.tar.gz foo@tools.goa.systems:/tmp
-             ssh foo@tools.goa.systems "deploymaven /tmp/goa.systems.commons-$LIB_VERS.tar.gz goa.systems commons $LIB_VERS"
-             ssh foo@tools.goa.systems "rm /tmp/goa.systems.commons-$LIB_VERS.tar.gz"
+             scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
+             ssh foo@tools.goa.systems "deploymaven /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz goa.systems commons $ARTIFACT_VERSION"
+             ssh foo@tools.goa.systems "rm /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
