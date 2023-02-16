@@ -18,8 +18,8 @@ jobs:
              -Dsonar.projectKey=goa.systems.commons \
              -Dsonar.sources=src/main/java \
              -Dsonar.java.binaries=build/classes \
-             -Dsonar.host.url=http://localhost:9000 \
-             -Dsonar.login=sqp_53baac78b268d26f9cf42878829ebb3d726783e9
+             -Dsonar.host.url=https://sonarqube.dom.schrotti12.eu \
+             -Dsonar.login=sqp_fc4e0f01ef74c847c23fa2f4d1914c84078c1d8b
       - run: |
              scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
              ssh foo@tools.goa.systems "deploymaven /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz goa.systems commons $ARTIFACT_VERSION"
