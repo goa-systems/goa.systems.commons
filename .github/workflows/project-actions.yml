@@ -14,12 +14,13 @@ jobs:
       - run: chmod u+x gradlew
       - run: ./gradlew -PARTIFACT_VERSION=$ARTIFACT_VERSION distribute
       - run: |
+             source ~/.sqcredentials
              sonar-scanner \
              -Dsonar.projectKey=goa.systems.commons \
              -Dsonar.sources=src/main/java \
              -Dsonar.java.binaries=build/classes \
-             -Dsonar.host.url=https://sonarqube.dom.schrotti12.eu \
-             -Dsonar.login=sqp_fc4e0f01ef74c847c23fa2f4d1914c84078c1d8b
+             -Dsonar.host.url=$SQSERVER \
+             -Dsonar.login=$SQTOKEN
         if: ${{ github.ref == 'refs/heads/main' }}
       - run: |
              scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
