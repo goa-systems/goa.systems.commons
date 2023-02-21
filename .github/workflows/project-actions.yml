@@ -19,8 +19,8 @@ jobs:
              -Dsonar.projectKey=goa.systems.commons \
              -Dsonar.sources=src/main/java \
              -Dsonar.java.binaries=build/classes \
-             -Dsonar.host.url=$SQSERVER \
-             -Dsonar.login=$SQTOKEN
+             -Dsonar.host.url=${{ vars.SQSERVER }} \
+             -Dsonar.login=${{ vars.SQTOKEN }}
         if: ${{ github.ref == 'refs/heads/main' }}
       - run: |
              scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
