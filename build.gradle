@@ -4,7 +4,7 @@ plugins {
 
 sourceCompatibility = 11
 targetCompatibility = 11
-def version = ARTIFACT_VERSION
+version = ARTIFACT_VERSION
 def group = 'goa.systems'
 
 configurations {
@@ -34,14 +34,6 @@ repositories {
 	mavenCentral()
 }
 
-task writeVariables(group: 'build', description: 'Writes variables for maven') {
-	doLast {
-		
-		def artifact = project.archivesBaseName.substring(group.size() + 1)
-        file("build/export/vars").text = """export VERSION=${version}\nexport GROUP=${group}\nexport ARTIFACT=${artifact}"""
-    }
-}
-
 task export(group: 'build', description: 'Exports application.') {
 	
 	dependsOn build, jar
@@ -66,9 +58,18 @@ task export(group: 'build', description: 'Exports application.') {
 		}
 	}
 }
+
+task writeVariables(group: 'build', description: 'Writes variables for maven') {
+	dependsOn export
+	doLast {
+		
+		def artifact = project.archivesBaseName.substring(group.size() + 1)
+        file("build/export/vars").text = """export VERSION=${version}\nexport GROUP=${group}\nexport ARTIFACT=${artifact}"""
+    }
+}
 		
 task distribute(type: Tar, group: 'build', description: 'Creates tgz distribution.') {
-    dependsOn export
+    dependsOn writeVariables
     from 'build/export'
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
