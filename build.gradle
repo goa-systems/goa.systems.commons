@@ -4,7 +4,8 @@ plugins {
 
 sourceCompatibility = 11
 targetCompatibility = 11
-version = ARTIFACT_VERSION
+def version = ARTIFACT_VERSION
+def group = 'goa.systems'
 
 configurations {
 	testImplementation.extendsFrom(fullSetup)
@@ -31,6 +32,14 @@ test {
 
 repositories {
 	mavenCentral()
+}
+
+task writeVariables(group: 'build', description: 'Writes variables for maven') {
+	doLast {
+		
+		def artifact = project.archivesBaseName.substring(group.size() + 1)
+        file("build/export/vars").text = """export VERSION=${version}\nexport GROUP=${group}\nexport ARTIFACT=${artifact}"""
+    }
 }
 
 task export(group: 'build', description: 'Exports application.') {
