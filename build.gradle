@@ -45,6 +45,13 @@ task export(group: 'build', description: 'Exports application.') {
 			into "build/export/lib"
 			include "*.jar"
 		}
+	
+		copy {
+			from "."
+			into "build/export"
+			include "README.md"
+			filter { line -> line.replace('{version}', version) }
+		}
 		
 		copy {
 			from configurations.runtimeClasspath
