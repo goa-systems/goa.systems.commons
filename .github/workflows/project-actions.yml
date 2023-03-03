@@ -12,7 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: chmod u+x gradlew
+        name: Make Gradle wrapper executable
       - run: ./gradlew -PARTIFACT_VERSION=$ARTIFACT_VERSION distribute
+        name: Build distribution
       - run: |
              source ~/.sqcredentials
              sonar-scanner \
@@ -22,8 +24,10 @@ jobs:
              -Dsonar.host.url=$SQSERVER \
              -Dsonar.login=$SQTOKEN
         if: ${{ github.ref == 'refs/heads/main' }}
+        name: Run SonarQube scanner
       - run: |
              scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
              ssh foo@tools.goa.systems "deployartifact /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
              ssh foo@tools.goa.systems "rm /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
         if: ${{ github.ref == 'refs/heads/main' }}
+        name: Publish artifact
