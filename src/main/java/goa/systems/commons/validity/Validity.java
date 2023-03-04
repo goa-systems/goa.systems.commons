@@ -41,7 +41,7 @@ public class Validity {
 	 * @return Returns the given string or an empty string if the given string was
 	 *         null.
 	 */
-	public String validifyString(String s) {
+	public static String validifyString(String s) {
 		return s == null ? "" : s;
 	}
 }
