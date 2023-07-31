@@ -1,13 +1,14 @@
 plugins {
 	id 'java-library'
+	id 'maven-publish'
 }
 
 version = ARTIFACT_VERSION
 def group = 'goa.systems'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
 }
 
 configurations {
@@ -21,11 +22,11 @@ dependencies {
 	/* Specify all dependencies in configuration fullSetup that are conveniently used during development and
 	   that allow execution of the application but which are optional and up to the customer to define. */
 	fullSetup ('ch.qos.logback:logback-core:1.4.8') {
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-    }
+		exclude group: 'org.slf4j', module: 'slf4j-api'
+	}
 	fullSetup ('ch.qos.logback:logback-classic:1.4.8') {
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-    }
+		exclude group: 'org.slf4j', module: 'slf4j-api'
+	}
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
 }
 
@@ -66,6 +67,11 @@ task export(group: 'build', description: 'Exports application.') {
 			from 'src/test/resources/logback.xml'
 			into 'build/export/conf'
 		}
+		
+		copy {
+			from 'build/publications/maven/pom-default.xml'
+			into 'build/export/conf'
+		}
 	}
 }
 
@@ -73,19 +79,35 @@ task writeVariables(group: 'build', description: 'Writes variables for maven') {
 	dependsOn export
 	doLast {
 		
-		def artifact = project.archivesBaseName.substring(group.size() + 1)
-        file("build/export/vars").text = """export VERSION=${version}\nexport GROUP=${group}\nexport ARTIFACT=${artifact}"""
-    }
+		def artifact = rootProject.name.substring(group.size() + 1)
+		file("build/export/vars").text = """export VERSION=${version}\nexport GROUP=${group}\nexport ARTIFACT=${artifact}"""
+	}
 }
 		
 task distribute(type: Tar, group: 'build', description: 'Creates tgz distribution.') {
-    dependsOn writeVariables
-    from 'build/export'
-    archiveExtension = 'tar.gz'
-    compression = Compression.GZIP
+	dependsOn writeVariables
+	from 'build/export'
+	archiveExtension = 'tar.gz'
+	compression = Compression.GZIP
 }
 
 java {
 	withSourcesJar()
 	withJavadocJar()
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId = group
+			artifactId = rootProject.name.substring(group.size() + 1)
+			version = version
+			from components.java
+
+			pom {
+				name = 'My Library'
+				description = 'A description of my library'
+			}
+		}
+	}
 }
