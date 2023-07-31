@@ -1,5 +1,6 @@
 package goa.systems.commons.validity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,5 +30,12 @@ class ValidityTest {
 		assertTrue(Validity.isOnlyOneSet("test", ""));
 		assertFalse(Validity.isOnlyOneSet("test", "test"));
 		assertFalse(Validity.isOnlyOneSet("test", "test"));
+	}
+
+	@Test
+	void test3() {
+		assertEquals("", Validity.validifyString(null));
+		assertEquals("", Validity.validifyString(""));
+		assertEquals("test", Validity.validifyString("test"));
 	}
 }

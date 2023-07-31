@@ -33,4 +33,15 @@ public class Validity {
 	public static boolean isOnlyOneSet(String str1, String str2) {
 		return isNullOrEmpty(str1) ^ isNullOrEmpty(str2);
 	}
+
+	/**
+	 * Makes sure, that a string is not null.
+	 * 
+	 * @param s String to make valid
+	 * @return Returns the given string or an empty string if the given string was
+	 *         null.
+	 */
+	public static String validifyString(String s) {
+		return s == null ? "" : s;
+	}
 }

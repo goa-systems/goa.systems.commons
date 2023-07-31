@@ -24,3 +24,4 @@ dependencies {
 |Version|Description|
 |-|-|
 |0.3.1|Migration to GitHub complete. Dependency updates.|
+|0.4.0|Adding logic to make a given string valid.|

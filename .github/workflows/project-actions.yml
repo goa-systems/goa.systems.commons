@@ -4,7 +4,7 @@ run-name: Build commons project
 on: [push,workflow_dispatch]
 
 env:
-  ARTIFACT_VERSION: 0.3.3
+  ARTIFACT_VERSION: 0.4.0
 
 jobs:
   build-commons-lib:
