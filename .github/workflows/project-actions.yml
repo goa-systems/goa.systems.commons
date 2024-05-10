@@ -23,12 +23,12 @@ jobs:
             jar \
             sourcesJar \
             javadocJar \
+            generatePomFileForCommonsPublication \
             exportPom \
             exportLogbackConfig \
             exportReadme \
             exportApplicationLibraries \
             exportFullSetupDependencies \
-            generatePomFileForCommonsPublication \
             writeVariables \
             distribute \
             jacocoTestReport

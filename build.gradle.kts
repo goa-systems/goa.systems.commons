@@ -50,10 +50,11 @@ tasks.register<Copy>("exportPom") {
 
 	group = "build"
 	description = "Copy application libraries"
-	doLast {
-		from("build/publications/maven/pom-default.xml")
-		into("build/export/conf")
-	}
+	dependsOn(tasks["generatePomFileForCommonsPublication"])
+
+	from(layout.buildDirectory.dir("publications/Commons"))
+	include("pom-default.xml")
+	into(layout.buildDirectory.dir("export/conf"))
 }
 
 tasks.register<Copy>("exportLogbackConfig") {
@@ -120,8 +121,8 @@ tasks.register<Tar>("distribute") {
 	group = "build"
 	description = "Creates tgz distribution."
 	dependsOn(tasks["exportReadme"])
-	dependsOn(tasks["exportPom"])
 	dependsOn(tasks["writeVariables"])
+	dependsOn(tasks["exportPom"])
 	dependsOn(tasks["exportLogbackConfig"])
 	dependsOn(tasks["exportFullSetupDependencies"])
 	dependsOn(tasks["exportApplicationLibraries"])
