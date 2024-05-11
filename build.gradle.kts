@@ -24,8 +24,7 @@ dependencies {
 
 	implementation("org.slf4j:slf4j-api:2.0.12")
 	
-	/* Specify all dependencies in configuration fullSetup that are conveniently used during development and
-	   that allow execution of the application but which are optional and up to the customer to define. */
+	/* Specify all dependencies in configuration fullSetup that are conveniently used during development and that allow execution of the application but which are optional and up to the customer to define. */
 	fullSetup("ch.qos.logback:logback-core:1.5.3") {
 		exclude(group = "org.slf4j", module = "slf4j-api")
 	}
