@@ -22,13 +22,13 @@ repositories {
 
 dependencies {
 
-	implementation("org.slf4j:slf4j-api:2.0.12")
+	implementation("org.slf4j:slf4j-api:2.0.13")
 	
 	/* Specify all dependencies in configuration fullSetup that are conveniently used during development and that allow execution of the application but which are optional and up to the customer to define. */
-	fullSetup("ch.qos.logback:logback-core:1.5.3") {
+	fullSetup("ch.qos.logback:logback-core:1.5.6") {
 		exclude(group = "org.slf4j", module = "slf4j-api")
 	}
-	fullSetup("ch.qos.logback:logback-classic:1.5.3") {
+	fullSetup("ch.qos.logback:logback-classic:1.5.6") {
 		exclude(group = "org.slf4j", module = "slf4j-api")
 	}
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
