@@ -1,10 +1,13 @@
 name: build-commons-project
 run-name: Build commons project
 
-on: [push,workflow_dispatch]
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
 
 env:
-  ARTIFACT_VERSION: 0.5.2
+  ARTIFACT_VERSION: 0.6.0
 
 jobs:
   build-commons-lib:
