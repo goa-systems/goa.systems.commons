@@ -5,7 +5,8 @@ import java.util.List;
 
 public class PartitionCalculator {
 
-	public List<Partition> calculatePartitions(int disksize, int bootpartitionsize, int swapsize, DiskSizeUnit unit) {
+	public List<Partition> calculatePartitions(int disksize, int bootpartitionsize, int swapsize, DiskSizeUnit unit)
+			throws DiskInvalidException {
 
 		int factor = 0;
 		int mbroffset = 1024 * 1024;
@@ -17,11 +18,21 @@ public class PartitionCalculator {
 			factor = 1024;
 		} else if (unit == DiskSizeUnit.MEGABYTE) {
 			factor = 1024 * 1024;
-		} else if (unit == DiskSizeUnit.MEGABYTE) {
+		} else if (unit == DiskSizeUnit.GIGABYTE) {
 			factor = 1024 * 1024 * 1024;
 		}
 
 		List<Partition> partitions = new ArrayList<>();
+
+		Partition boot = new Partition();
+		boot.setOffset(mbroffset);
+		boot.setSize(bootpartitionsize * factor);
+
+		if (boot.getSize() > disksize) {
+			throw new DiskInvalidException("Size of partitions is larger than disksize.");
+		}
+
+		partitions.add(boot);
 
 		return partitions;
 	}
