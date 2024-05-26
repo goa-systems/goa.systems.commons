@@ -3,12 +3,12 @@ package goa.systems.commons.linux;
 public class Partition {
 
 	private String device;
-	private int size;
+	private long size;
 	private String wipe;
 	private int number;
 	private boolean preserve;
 	private boolean grubDevice;
-	private int offset;
+	private long offset;
 	private boolean resize;
 	private String type;
 	private String id;
@@ -21,11 +21,11 @@ public class Partition {
 		this.device = device;
 	}
 
-	public int getSize() {
+	public long getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public void setSize(long size) {
 		this.size = size;
 	}
 
@@ -61,11 +61,11 @@ public class Partition {
 		this.grubDevice = grubDevice;
 	}
 
-	public int getOffset() {
+	public long getOffset() {
 		return offset;
 	}
 
-	public void setOffset(int offset) {
+	public void setOffset(long offset) {
 		this.offset = offset;
 	}
 
