@@ -1,5 +1,5 @@
 package goa.systems.commons.linux;
 
 public enum DiskSizeUnit {
-	BYTE, KILOBYTE, MEGABYTE, GIGABYTE
+	BYTE, KILOBYTE, MEGABYTE
 }

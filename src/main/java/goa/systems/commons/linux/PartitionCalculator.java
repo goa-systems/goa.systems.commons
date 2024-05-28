@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PartitionCalculator {
 
-	public List<Partition> calculatePartitions(int disksize, int bootpartitionsize, int swapsize, DiskSizeUnit unit)
+	public List<Partition> calculatePartitions(long disksize, long bootpartitionsize, long swapsize, DiskSizeUnit unit)
 			throws DiskInvalidException {
 
 		if (bootpartitionsize + swapsize > disksize) {
@@ -22,20 +22,27 @@ public class PartitionCalculator {
 			factor = 1024;
 		} else if (unit == DiskSizeUnit.MEGABYTE) {
 			factor = 1048576;
-		} else if (unit == DiskSizeUnit.GIGABYTE) {
-			factor = 1073741824;
 		}
 
 		List<Partition> partitions = new ArrayList<>();
 
 		Partition boot = new Partition();
+		boot.setNumber(1);
+		boot.setGrubDevice(true);
+		boot.setFlag("boot");
 		boot.setOffset(mbroffset);
+		boot.setResize(true);
 		boot.setSize(bootpartitionsize * factor);
 
 		Partition swap = new Partition();
+		swap.setNumber(3);
+		swap.setFlag("swap");
+		swap.setResize(true);
 		swap.setSize(swapsize * factor);
 
 		Partition root = new Partition();
+		root.setNumber(2);
+		root.setResize(true);
 		root.setOffset(mbroffset + boot.getSize());
 		root.setSize((disksize * factor) - boot.getSize() - swap.getSize() - (2 * mbroffset));
 
