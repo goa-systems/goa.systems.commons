@@ -33,6 +33,10 @@ dependencies {
 	}
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	
+    testImplementation("ch.qos.logback:logback-classic:1.5.6")
+    testImplementation("ch.qos.logback:logback-core:1.5.6")
+    
 }
 
 java {
