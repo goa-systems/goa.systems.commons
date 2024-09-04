@@ -36,18 +36,14 @@ jobs:
             distribute \
             jacocoTestReport
       - name: Run SonarQube scanner
-        run: |
-          source ~/.sqcredentials
-          sonar-scanner \
-            -Dsonar.projectKey=goa.systems.commons \
-            -Dsonar.sources=src/main/java \
-            -Dsonar.java.libraries=build/libs \
-            -Dsonar.java.binaries=build/classes \
-            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
-            -Dsonar.junit.reportsPath=build/test-results \
-            -Dsonar.host.url=$SQSERVER \
-            -Dsonar.login=$SQTOKEN
         if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          docker run \
+          --rm \
+          -v "${PWD}:/usr/src" \
+          -e SONAR_SCANNER_OPTS="-Dsonar.host.url=${{ vars.SQSERVER }} -Dsonar.token=${{ secrets.SQTOKEN }} -Dsonar.projectKey=goa.systems.commons -Dsonar.sources=src/main -Dsonar.java.libraries=build/libs -Dsonar.java.binaries=build/classes -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml -Dsonar.junit.reportsPath=build/test-results -Xdiag" \
+          --network host \
+          sonarsource/sonar-scanner-cli
       - name: Publish artifact
         run: |
              scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
