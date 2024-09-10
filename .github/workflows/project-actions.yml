@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  ARTIFACT_VERSION: 0.7.0
+  ARTIFACT_VERSION: 0.6.0
 
 jobs:
   build-commons-lib:
