@@ -4,8 +4,9 @@ plugins {
     `jacoco`
 }
 
-group = "goa.systems"
-version = project.property("ARTIFACT_VERSION").toString()
+val group = "goa.systems".toString()
+val artifactname = "commons".toString()
+val version = project.property("ARTIFACT_VERSION").toString()
 
 val fullSetup by configurations.creating {
 	extendsFrom(configurations["testImplementation"])
@@ -60,16 +61,6 @@ tasks.register<Copy>("exportPom") {
 	into(layout.buildDirectory.dir("export/conf"))
 }
 
-tasks.register<Copy>("exportReadme") {
-
-	group = "build"
-	description = "Copy application libraries"
-	
-	from(".")
-	into(layout.buildDirectory.dir("export"))
-	include("README.md")
-}
-
 tasks.register<Copy>("exportApplicationLibraries") {
 
 	group = "build"
@@ -115,14 +106,14 @@ tasks.register<Tar>("distribute") {
 
 publishing {
     publications {
-        create<MavenPublication>("Commons") {
-            groupId = "goa.systems"
-            artifactId = "commons"
+        create<MavenPublication>(artifactname) {
+            groupId = group
+            artifactId = artifactname
             version = version
             from(components["java"])
             pom {
-				name = "GOA systems commons"
-				description = "A collection of library functions."
+				name = "GOA systems " + artifactname
+				description = "A library."
 			}
         }
     }
