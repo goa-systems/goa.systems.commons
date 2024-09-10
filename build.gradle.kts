@@ -60,16 +60,6 @@ tasks.register<Copy>("exportPom") {
 	into(layout.buildDirectory.dir("export/conf"))
 }
 
-tasks.register<Copy>("exportLogbackConfig") {
-
-	group = "build"
-	description = "Copy application libraries"
-	from("src/test/resources")
-	include("logback-test.xml")
-	into(layout.buildDirectory.dir("export/conf"))
-	rename("logback-test\\.xml", "logback.xml")
-}
-
 tasks.register<Copy>("exportReadme") {
 
 	group = "build"
@@ -95,17 +85,6 @@ tasks.register<Copy>("exportApplicationLibraries") {
 	
 }
 
-tasks.register<Copy>("exportFullSetupDependencies") {
-
-	group = "build"
-	description = "Copy full setup dependencies"
-	
-	from(configurations.runtimeClasspath)
-	from(configurations["fullSetup"])
-    into(layout.buildDirectory.dir("export/lib"))
-	
-}
-
 tasks.register("writeVariables") {
 
 	group = "build"
@@ -123,11 +102,9 @@ tasks.register<Tar>("distribute") {
 
 	group = "build"
 	description = "Creates tgz distribution."
-	dependsOn(tasks["exportReadme"])
+	
 	dependsOn(tasks["writeVariables"])
 	dependsOn(tasks["exportPom"])
-	dependsOn(tasks["exportLogbackConfig"])
-	dependsOn(tasks["exportFullSetupDependencies"])
 	dependsOn(tasks["exportApplicationLibraries"])
 	
 	from(layout.buildDirectory.dir("export"))

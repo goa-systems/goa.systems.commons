@@ -13,11 +13,12 @@ jobs:
   build-commons-lib:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-      - name: Make Gradle wrapper executable
-        run: |
-          chmod u+x gradlew
+      - name: Set permissions
+        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+      - name: Checkout project
+        uses: actions/checkout@v4
       - name: Build distribution
+<<<<<<< HEAD
         run: |
           ./gradlew \
             -PARTIFACT_VERSION=$ARTIFACT_VERSION \
@@ -36,6 +37,19 @@ jobs:
             distribute \
             jacocoTestReport
       - name: Run SonarQube scanner
+=======
+        run: docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk11 gradle -PARTIFACT_VERSION=$ARTIFACT_VERSION distribute
+      - name: Set permissions
+        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+      - name: Analyze project
+        run: | 
+          docker run \
+          --rm \
+          -v "${PWD}:/usr/src" \
+          -e SONAR_SCANNER_OPTS="-Dsonar.host.url=${{ vars.SQSERVER }} -Dsonar.token=${{ secrets.SQTOKEN }} -Dsonar.projectKey=goa.systems.commons -Dsonar.sources=src/main -Dsonar.java.libraries=build/libs -Dsonar.java.binaries=build/classes -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml -Dsonar.junit.reportsPath=build/test-results -Xdiag" \
+          --network host \
+          sonarsource/sonar-scanner-cli
+>>>>>>> refs/heads/release/0.6.0
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           docker run \
@@ -46,7 +60,14 @@ jobs:
           sonarsource/sonar-scanner-cli
       - name: Publish artifact
         run: |
+<<<<<<< HEAD
              scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
              ssh foo@tools.goa.systems "deployartifact /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
              ssh foo@tools.goa.systems "rm /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
         if: ${{ github.ref == 'refs/heads/main' }}
+=======
+          scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
+          ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
+          ssh foo@tools.goa.systems "rm /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
+        if: ${{ github.ref == 'refs/heads/main' }}
+>>>>>>> refs/heads/release/0.6.0
