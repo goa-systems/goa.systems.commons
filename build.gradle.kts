@@ -6,7 +6,7 @@ plugins {
 
 val group = "goa.systems".toString()
 val artifactname = "commons".toString()
-val version = project.property("ARTIFACT_VERSION").toString()
+version = project.property("ARTIFACT_VERSION").toString()
 
 val fullSetup by configurations.creating {
 	extendsFrom(configurations["testImplementation"])
@@ -88,6 +88,21 @@ tasks.register("writeVariables") {
         }
 	}
 }
+
+tasks.register<Copy>("exportFromLocalRepo"){
+    group = "build"
+    description = "Exports from local Maven repository"
+    
+    dependsOn(tasks.get("publishCommonsPublicationToProjectRepository"))
+    
+    from(layout.buildDirectory.dir("repo/goa/systems/commons/" + version))
+    into(layout.buildDirectory.dir("test"))
+    
+    include("commons-" + version + ".jar")
+    include("commons-" + version + "-javadoc.jar")
+    include("commons-" + version + "-sources.jar")
+    include("commons-" + version + ".pom")
+}
 		
 tasks.register<Tar>("distribute") {
 
@@ -105,6 +120,14 @@ tasks.register<Tar>("distribute") {
 }
 
 publishing {
+
+    repositories {
+        maven {
+            name = "Project"
+            url = uri(layout.buildDirectory.dir("repo"))
+        }
+    }
+    
     publications {
         create<MavenPublication>(artifactname) {
             groupId = group
