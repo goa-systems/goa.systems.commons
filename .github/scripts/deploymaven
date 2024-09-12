@@ -10,11 +10,11 @@ TMPDIR="/tmp/$(uuidgen)"
 if [ -d "${TMPDIR}" ]; then rm -rf "${TMPDIR}"; fi
 mkdir -p "${TMPDIR}"
 
-if [ -d "${LOCALCACHEDIR}/maven/${MAVENVERS}" ]
+if [ -d "${LOCALCACHEDIR}/maven/${MAVENDIST}" ]
 then
-    echo "Maven is present in ${LOCALCACHEDIR}/maven/${MAVENVERS}. Skipping installation"
+    echo "Maven is present in ${LOCALCACHEDIR}/maven/${MAVENDIST}. Skipping installation"
 else
-    echo "Installing maven to ${LOCALCACHEDIR}/maven/${MAVENVERS}"
+    echo "Installing maven to ${LOCALCACHEDIR}/maven/${MAVENDIST}"
     if [ ! -d "${LOCALCACHEDIR}/maven" ]; then mkdir -p "${LOCALCACHEDIR}/maven"; fi
     DISTMAVEN="https://dlcdn.apache.org/maven/maven-3/${MAVENVERS}/binaries/${MAVENDIST}-bin.tar.gz"
     wget --quiet -O "${TMPDIR}/maven.tar.gz" "${DISTMAVEN}"
@@ -24,9 +24,9 @@ fi
 
 if [ -d "${LOCALCACHEDIR}/java/${JAVAVERS}" ]
 then
-    echo "Java is present in ${LOCALCACHEDIR}/maven/${JAVAVERS}. Skipping installation"
+    echo "Java is present in ${LOCALCACHEDIR}/java/${JAVAVERS}. Skipping installation"
 else
-    echo "Installing Java to ${LOCALCACHEDIR}/maven/${JAVAVERS}"
+    echo "Installing Java to ${LOCALCACHEDIR}/java/${JAVAVERS}"
     if [ ! -d "${LOCALCACHEDIR}/java" ]; then mkdir -p "${LOCALCACHEDIR}/java"; fi
     DISTJAVA="https://cdn.azul.com/zulu/bin/${JAVAVERS}.tar.gz"
     wget --quiet -O "${TMPDIR}/java.tar.gz" "${DISTJAVA}"
@@ -35,7 +35,7 @@ else
 fi
 
 OLDPATH="${PATH}"
-PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENVERS}/bin:$PATH"
+PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENDIST}/bin:$PATH"
 
 mvn --version
 java --version
