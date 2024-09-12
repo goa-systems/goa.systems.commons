@@ -59,7 +59,7 @@ tasks.register<Copy>("exportPom") {
 	description = "Copy application libraries"
 	dependsOn(tasks["generatePomFileForCommonsPublication"])
 
-	from(layout.buildDirectory.dir("publications/Commons"))
+	from(layout.buildDirectory.dir("publications/commons"))
 	include("pom-default.xml")
 	into(layout.buildDirectory.dir("export/conf"))
 }
