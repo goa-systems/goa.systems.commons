@@ -4,8 +4,11 @@ plugins {
     `jacoco`
 }
 
-val group = "goa.systems".toString()
+group = "goa.systems"
+val groupname = group.toString()
 val artifactname = "commons".toString()
+val localreponame = "Project"
+val repodir = "repo"
 version = project.property("ARTIFACT_VERSION").toString()
 
 val fullSetup by configurations.creating {
@@ -93,9 +96,9 @@ tasks.register<Copy>("exportFromLocalRepo"){
     group = "build"
     description = "Exports from local Maven repository"
     
-    dependsOn(tasks.get("publishCommonsPublicationToProjectRepository"))
+    dependsOn(tasks.get("publishCommonsPublicationTo" + localreponame + "Repository"))
     
-    from(layout.buildDirectory.dir("repo/goa/systems/commons/" + version))
+    from(layout.buildDirectory.dir(repodir + "/" + groupname.replace(".", "/") + "/" + artifactname + "/" + version))
     into(layout.buildDirectory.dir("test"))
     
     include("commons-" + version + ".jar")
@@ -123,15 +126,15 @@ publishing {
 
     repositories {
         maven {
-            name = "Project"
-            url = uri(layout.buildDirectory.dir("repo"))
+            name = localreponame
+            url = uri(layout.buildDirectory.dir(repodir))
         }
     }
     
     publications {
         create<MavenPublication>(artifactname) {
-            groupId = group
-            artifactId = artifactname
+            groupId = group.toString()
+            artifactId = artifactname.toString()
             version = version
             from(components["java"])
             pom {
