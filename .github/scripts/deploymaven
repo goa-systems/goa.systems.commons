@@ -61,3 +61,4 @@ rm -rf "${DIR}"
 rm -rf "${TMPDIR}"
 
 PATH="${OLDPATH}"
+unset OLDPATH
