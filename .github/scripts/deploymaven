@@ -4,22 +4,38 @@ JAVAVERS="zulu21.36.17-ca-jdk21.0.4-linux_x64"
 MAVENVERS="3.9.9"
 MAVENDIST="apache-maven-${MAVENVERS}"
 
-DISTJAVA="https://cdn.azul.com/zulu/bin/${JAVAVERS}.tar.gz"
-DISTMAVEN="https://dlcdn.apache.org/maven/maven-3/${MAVENVERS}/binaries/${MAVENDIST}-bin.tar.gz"
+LOCALCACHEDIR="${HOME}/.buildtools"
 TMPDIR="/tmp/$(uuidgen)"
 
 if [ -d "${TMPDIR}" ]; then rm -rf "${TMPDIR}"; fi
-mkdir -p "${TMPDIR}/download"
-mkdir -p "${TMPDIR}/java"
-mkdir -p "${TMPDIR}/maven"
+mkdir -p "${TMPDIR}"
 
-wget --quiet -O "${TMPDIR}/download/java.tar.gz" "${DISTJAVA}"
-wget --quiet -O "${TMPDIR}/download/maven.tar.gz" "${DISTMAVEN}"
+if [ -d "${LOCALCACHEDIR}/maven/${MAVENVERS}" ]
+then
+    echo "Maven is present in ${LOCALCACHEDIR}/maven/${MAVENVERS}. Skipping installation"
+else
+    echo "Installing maven to ${LOCALCACHEDIR}/maven/${MAVENVERS}"
+    if [ ! -d "${LOCALCACHEDIR}/maven" ]; then mkdir -p "${LOCALCACHEDIR}/maven"; fi
+    DISTMAVEN="https://dlcdn.apache.org/maven/maven-3/${MAVENVERS}/binaries/${MAVENDIST}-bin.tar.gz"
+    wget --quiet -O "${TMPDIR}/maven.tar.gz" "${DISTMAVEN}"
+    tar -x -f "${TMPDIR}/maven.tar.gz" -C "${LOCALCACHEDIR}/maven"
+    rm "${TMPDIR}/maven.tar.gz"
+fi
 
-tar -x -f "${TMPDIR}/download/java.tar.gz" -C "${TMPDIR}/java/"
-tar -x -f "${TMPDIR}/download/maven.tar.gz" -C "${TMPDIR}/maven/"
+if [ -d "${LOCALCACHEDIR}/java/${JAVAVERS}" ]
+then
+    echo "Java is present in ${LOCALCACHEDIR}/maven/${JAVAVERS}. Skipping installation"
+else
+    echo "Installing Java to ${LOCALCACHEDIR}/maven/${JAVAVERS}"
+    if [ ! -d "${LOCALCACHEDIR}/java" ]; then mkdir -p "${LOCALCACHEDIR}/java"; fi
+    DISTJAVA="https://cdn.azul.com/zulu/bin/${JAVAVERS}.tar.gz"
+    wget --quiet -O "${TMPDIR}/java.tar.gz" "${DISTJAVA}"
+    tar -x -f "${TMPDIR}/java.tar.gz" -C "${LOCALCACHEDIR}/java"
+    rm "${TMPDIR}/java.tar.gz"
+fi
 
-PATH="${TMPDIR}/java/${JAVAVERS}/bin:${TMPDIR}/maven/${MAVENDIST}/bin:$PATH"
+OLDPATH="${PATH}"
+PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENVERS}/bin:$PATH"
 
 mvn --version
 java --version
@@ -43,3 +59,5 @@ mvn deploy:deploy-file \
 
 rm -rf "${DIR}"
 rm -rf "${TMPDIR}"
+
+PATH="${OLDPATH}"
