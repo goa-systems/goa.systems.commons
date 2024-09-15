@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 env:
-  ARTIFACT_VERSION: 0.6.0
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
+  ARTIFACT_VERSION: 0.6.0
 
 jobs:
   build-commons-lib:
@@ -34,8 +34,8 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
       - name: Publish artifact
         run: |
-          FILENAME=$ARTIFACT_ID.tar.gz
+          FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
           scp build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
-          ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME"
+          ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
           ssh foo@tools.goa.systems "rm /tmp/$FILENAME"
         if: ${{ github.ref == 'refs/heads/main' }}
