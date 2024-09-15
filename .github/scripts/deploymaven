@@ -49,9 +49,9 @@ DIR="/tmp/$(uuidgen)"
 mkdir "${DIR}"
 tar -x -f "${DIST}" -C "${DIR}"
 mvn deploy:deploy-file \
- -Dfile=${DIR}/lib/${GROUP}.${ARTIFACT}-${VERSION}.jar \
- -Dsources=${DIR}/lib/${GROUP}.${ARTIFACT}-${VERSION}-sources.jar \
- -Djavadoc=${DIR}/lib/${GROUP}.${ARTIFACT}-${VERSION}-javadoc.jar \
+ -Dfile=${DIR}/lib/${ARTIFACT}-${VERSION}.jar \
+ -Dsources=${DIR}/lib/${ARTIFACT}-${VERSION}-sources.jar \
+ -Djavadoc=${DIR}/lib/${ARTIFACT}-${VERSION}-javadoc.jar \
  -DgroupId=${GROUP} \
  -DartifactId=${ARTIFACT} \
  -Dversion=${VERSION} \
