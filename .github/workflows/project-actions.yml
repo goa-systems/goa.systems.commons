@@ -34,7 +34,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
       - name: Publish artifact
         run: |
-          FILENAME=$ARTIFACT_GROUP.$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
+          FILENAME=$ARTIFACT_ID.tar.gz
           scp build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
           ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME"
           ssh foo@tools.goa.systems "rm /tmp/$FILENAME"
