@@ -117,7 +117,7 @@ tasks.register<Tar>("distribute") {
     dependsOn(tasks["exportFromLocalRepo"])
     
     from(layout.buildDirectory.dir("test"))
-    archiveBaseName = "dist"
+    archiveBaseName = artifactname + "-" + version
     destinationDirectory = layout.buildDirectory.dir("distributions")
     archiveExtension.set("tar.gz")
     compression = Compression.GZIP
