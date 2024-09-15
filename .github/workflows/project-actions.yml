@@ -8,6 +8,8 @@ on:
 
 env:
   ARTIFACT_VERSION: 0.6.0
+  ARTIFACT_GROUP: "goa.systems"
+  ARTIFACT_ID: "commons"
 
 jobs:
   build-commons-lib:
@@ -18,7 +20,7 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
       - name: Build distribution
-        run: docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION=$ARTIFACT_VERSION distribute
+        run: docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
       - name: Set permissions
         run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
       - name: Analyze project
@@ -32,7 +34,8 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
       - name: Publish artifact
         run: |
-          scp build/distributions/goa.systems.commons-$ARTIFACT_VERSION.tar.gz foo@tools.goa.systems:/tmp
-          ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
-          ssh foo@tools.goa.systems "rm /tmp/goa.systems.commons-$ARTIFACT_VERSION.tar.gz"
+          FILENAME=$ARTIFACT_GROUP.$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
+          scp build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
+          ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME"
+          ssh foo@tools.goa.systems "rm /tmp/$FILENAME"
         if: ${{ github.ref == 'refs/heads/main' }}
