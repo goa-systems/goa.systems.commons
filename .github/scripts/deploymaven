@@ -56,7 +56,7 @@ mvn deploy:deploy-file \
  -DartifactId=${ARTIFACT} \
  -Dversion=${VERSION} \
  -Dpackaging=jar \
- -DpomFile=${DIR}/pom-default.xml \
+ -DpomFile=${DIR}/${ARTIFACT}-${VERSION}.pom \
  -DcreateChecksum=true \
  -Durl=file:/var/www/mvn
 
