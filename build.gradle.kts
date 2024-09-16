@@ -14,10 +14,6 @@ val groupname = group.toString()
 val localreponame = "Project"
 val repodir = "repo"
 
-val fullSetup by configurations.creating {
-    extendsFrom(configurations["testImplementation"])
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -31,19 +27,11 @@ dependencies {
 
     implementation("org.slf4j:slf4j-api:2.0.13")
     
-    /* Specify all dependencies in configuration fullSetup that are conveniently used during development and that allow execution of the application but which are optional and up to the customer to define. */
-    fullSetup("ch.qos.logback:logback-core:1.5.6") {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
-    fullSetup("ch.qos.logback:logback-classic:1.5.6") {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
+    testImplementation("ch.qos.logback:logback-core:1.5.6")
+    testImplementation("ch.qos.logback:logback-classic:1.5.6")
+    
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    
-    testImplementation("ch.qos.logback:logback-classic:1.5.6")
-    testImplementation("ch.qos.logback:logback-core:1.5.6")
-    
 }
 
 java {
