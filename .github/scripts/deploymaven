@@ -38,7 +38,9 @@ setup_env () {
     fi
 
     OLD_PATH="${PATH}"
+    OLD_JAVAHOME="${JAVA_HOME}"
     PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENDIST}/bin:$PATH"
+    JAVA_HOME="${LOCALCACHEDIR}/java/${JAVAVERS}"
 
     echo "================"
     mvn --version
@@ -52,7 +54,9 @@ setup_env () {
 # Resets the environment to the original state.
 unset_env () {
     PATH="${OLD_PATH}"
+    JAVA_HOME="${OLD_JAVAHOME}"
     unset OLD_PATH
+    unset OLD_JAVAHOME
 }
 
 setup_env
