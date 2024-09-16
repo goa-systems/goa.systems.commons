@@ -56,57 +56,29 @@ tasks.named<Test>("test") {
     finalizedBy(tasks.jacocoTestReport)
 }
 
-tasks.register<Copy>("exportPom") {
-
-    group = "build"
-    description = "Copy application libraries"
-    dependsOn(tasks["generatePomFileForCommonsPublication"])
-
-    from(layout.buildDirectory.dir("publications/" + artifactname))
-    include("pom-default.xml")
-    into(layout.buildDirectory.dir("export/conf"))
-}
-
-tasks.register<Copy>("exportApplicationLibraries") {
-
-    group = "build"
-    description = "Copy application libraries"
-    dependsOn(tasks["build"])
-    dependsOn(tasks["jar"])
-    dependsOn(tasks["javadocJar"])
-    dependsOn(tasks["sourcesJar"])
-    
-    from(layout.buildDirectory.dir("libs"))
-    into(layout.buildDirectory.dir("export/lib"))
-    include("*.jar")
-    
-}
-
-tasks.register("writeVariables") {
-
-    group = "build"
-    description = "Writes variables for maven"
-    
-    doLast {
-        with(layout.buildDirectory.file("export/vars").get().asFile) {
-            parentFile.mkdirs()
-            writeText("export VERSION=${version}\nexport GROUP=goa.systems\nexport ARTIFACT=commons")
-        }
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
     }
 }
 
 tasks.register<Copy>("exportFromLocalRepo"){
+
     group = "build"
     description = "Exports from local Maven repository"
     
+    dependsOn(tasks.clean)
     dependsOn(tasks.get("publish" + artifactname.replaceFirstChar(Char::titlecase) + "PublicationTo" + localreponame + "Repository"))
+    
     from(layout.buildDirectory.dir(repodir + "/" + groupname.replace(".", "/") + "/" + artifactname + "/" + version))
-    into(layout.buildDirectory.dir("test"))
     
     include(artifactname + "-" + version + ".jar")
     include(artifactname + "-" + version + "-javadoc.jar")
     include(artifactname + "-" + version + "-sources.jar")
     include(artifactname + "-" + version + ".pom")
+    
+    into(layout.buildDirectory.dir("test"))
 }
         
 tasks.register<Tar>("distribute") {
@@ -143,12 +115,5 @@ publishing {
                 description = "A library."
             }
         }
-    }
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required = true
     }
 }
