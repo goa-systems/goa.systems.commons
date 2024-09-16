@@ -40,8 +40,11 @@ setup_env () {
     OLD_PATH="${PATH}"
     PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENDIST}/bin:$PATH"
 
+    echo "================"
     mvn --version
+    echo "================"
     java --version
+    echo "================"
 
     rm -rf "${TMPDIR}"
 }
