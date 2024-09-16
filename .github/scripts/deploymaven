@@ -1,44 +1,58 @@
 #!/usr/bin/env bash
 
-JAVAVERS="zulu21.36.17-ca-jdk21.0.4-linux_x64"
-MAVENVERS="3.9.9"
-MAVENDIST="apache-maven-${MAVENVERS}"
+# Checks and installs Java and Maven on demand.
+setup_env () {
 
-LOCALCACHEDIR="${HOME}/.buildtools"
-TMPDIR="/tmp/$(uuidgen)"
+    local JAVAVERS="zulu21.36.17-ca-jdk21.0.4-linux_x64"
+    local MAVENVERS="3.9.9"
+    local MAVENDIST="apache-maven-${MAVENVERS}"
 
-if [ -d "${TMPDIR}" ]; then rm -rf "${TMPDIR}"; fi
-mkdir -p "${TMPDIR}"
+    local LOCALCACHEDIR="${HOME}/.buildtools"
+    local TMPDIR="/tmp/$(uuidgen)"
 
-if [ -d "${LOCALCACHEDIR}/maven/${MAVENDIST}" ]
-then
-    echo "Maven is present in ${LOCALCACHEDIR}/maven/${MAVENDIST}. Skipping installation"
-else
-    echo "Installing maven to ${LOCALCACHEDIR}/maven/${MAVENDIST}"
-    if [ ! -d "${LOCALCACHEDIR}/maven" ]; then mkdir -p "${LOCALCACHEDIR}/maven"; fi
-    DISTMAVEN="https://dlcdn.apache.org/maven/maven-3/${MAVENVERS}/binaries/${MAVENDIST}-bin.tar.gz"
-    wget --quiet -O "${TMPDIR}/maven.tar.gz" "${DISTMAVEN}"
-    tar -x -f "${TMPDIR}/maven.tar.gz" -C "${LOCALCACHEDIR}/maven"
-    rm "${TMPDIR}/maven.tar.gz"
-fi
+    if [ -d "${TMPDIR}" ]; then rm -rf "${TMPDIR}"; fi
+    mkdir -p "${TMPDIR}"
 
-if [ -d "${LOCALCACHEDIR}/java/${JAVAVERS}" ]
-then
-    echo "Java is present in ${LOCALCACHEDIR}/java/${JAVAVERS}. Skipping installation"
-else
-    echo "Installing Java to ${LOCALCACHEDIR}/java/${JAVAVERS}"
-    if [ ! -d "${LOCALCACHEDIR}/java" ]; then mkdir -p "${LOCALCACHEDIR}/java"; fi
-    DISTJAVA="https://cdn.azul.com/zulu/bin/${JAVAVERS}.tar.gz"
-    wget --quiet -O "${TMPDIR}/java.tar.gz" "${DISTJAVA}"
-    tar -x -f "${TMPDIR}/java.tar.gz" -C "${LOCALCACHEDIR}/java"
-    rm "${TMPDIR}/java.tar.gz"
-fi
+    if [ -d "${LOCALCACHEDIR}/maven/${MAVENDIST}" ]
+    then
+        echo "Maven is present in ${LOCALCACHEDIR}/maven/${MAVENDIST}. Skipping installation"
+    else
+        echo "Installing maven to ${LOCALCACHEDIR}/maven/${MAVENDIST}"
+        if [ ! -d "${LOCALCACHEDIR}/maven" ]; then mkdir -p "${LOCALCACHEDIR}/maven"; fi
+        DISTMAVEN="https://dlcdn.apache.org/maven/maven-3/${MAVENVERS}/binaries/${MAVENDIST}-bin.tar.gz"
+        wget --quiet -O "${TMPDIR}/maven.tar.gz" "${DISTMAVEN}"
+        tar -x -f "${TMPDIR}/maven.tar.gz" -C "${LOCALCACHEDIR}/maven"
+        rm "${TMPDIR}/maven.tar.gz"
+    fi
 
-OLDPATH="${PATH}"
-PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENDIST}/bin:$PATH"
+    if [ -d "${LOCALCACHEDIR}/java/${JAVAVERS}" ]
+    then
+        echo "Java is present in ${LOCALCACHEDIR}/java/${JAVAVERS}. Skipping installation"
+    else
+        echo "Installing Java to ${LOCALCACHEDIR}/java/${JAVAVERS}"
+        if [ ! -d "${LOCALCACHEDIR}/java" ]; then mkdir -p "${LOCALCACHEDIR}/java"; fi
+        DISTJAVA="https://cdn.azul.com/zulu/bin/${JAVAVERS}.tar.gz"
+        wget --quiet -O "${TMPDIR}/java.tar.gz" "${DISTJAVA}"
+        tar -x -f "${TMPDIR}/java.tar.gz" -C "${LOCALCACHEDIR}/java"
+        rm "${TMPDIR}/java.tar.gz"
+    fi
 
-mvn --version
-java --version
+    OLD_PATH="${PATH}"
+    PATH="${LOCALCACHEDIR}/java/${JAVAVERS}/bin:${LOCALCACHEDIR}/maven/${MAVENDIST}/bin:$PATH"
+
+    mvn --version
+    java --version
+
+    rm -rf "${TMPDIR}"
+}
+
+# Resets the environment to the original state.
+unset_env () {
+    PATH="${OLD_PATH}"
+    unset OLD_PATH
+}
+
+setup_env
 
 DIST="$1"
 GROUP="$2"
@@ -48,20 +62,21 @@ VERSION="$4"
 DIR="/tmp/$(uuidgen)"
 mkdir "${DIR}"
 tar -x -f "${DIST}" -C "${DIR}"
+
+ARTIFACTS_BASEPATH="${DIR}/${ARTIFACT}-${VERSION}"
+
 mvn deploy:deploy-file \
- -Dfile=${DIR}/${ARTIFACT}-${VERSION}.jar \
- -Dsources=${DIR}/${ARTIFACT}-${VERSION}-sources.jar \
- -Djavadoc=${DIR}/${ARTIFACT}-${VERSION}-javadoc.jar \
- -DgroupId=${GROUP} \
- -DartifactId=${ARTIFACT} \
- -Dversion=${VERSION} \
- -Dpackaging=jar \
- -DpomFile=${DIR}/${ARTIFACT}-${VERSION}.pom \
- -DcreateChecksum=true \
- -Durl=file:/var/www/mvn
+ -Dfile="${ARTIFACTS_BASEPATH}.jar" \
+ -Dsources="${ARTIFACTS_BASEPATH}-sources.jar" \
+ -Djavadoc="${ARTIFACTS_BASEPATH}-javadoc.jar" \
+ -DgroupId="${GROUP}" \
+ -DartifactId="${ARTIFACT}" \
+ -Dversion="${VERSION}" \
+ -Dpackaging="jar" \
+ -DpomFile="${ARTIFACTS_BASEPATH}.pom" \
+ -DcreateChecksum="true" \
+ -Durl="file:/var/www/mvn"
 
 rm -rf "${DIR}"
-rm -rf "${TMPDIR}"
 
-PATH="${OLDPATH}"
-unset OLDPATH
+unset_env
