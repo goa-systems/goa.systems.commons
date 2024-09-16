@@ -9,7 +9,7 @@ on:
 env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
-  ARTIFACT_VERSION: 0.6.0
+  ARTIFACT_VERSION: 0.7.0
 
 jobs:
   build-commons-lib:
