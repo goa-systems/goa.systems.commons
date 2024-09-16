@@ -4,13 +4,21 @@ plugins {
     `jacoco`
 }
 
-if (hasProperty("ARTIFACT_VERSION")) { version = property("ARTIFACT_VERSION").toString() } else { version = "0.0.0".toString() }
-if (hasProperty("ARTIFACT_GROUP")) { group = property("ARTIFACT_GROUP").toString() } else { group = "goa.systems".toString() }
+group = "goa.systems".toString()
+if (hasProperty("ARTIFACT_GROUP")) {
+    group = property("ARTIFACT_GROUP").toString()
+}
 
-var artifactname: String = ""
-if (hasProperty("ARTIFACT_ID")) { artifactname = property("ARTIFACT_ID").toString() } else { artifactname ="commons".toString() }
+var artifactname: String = "commons"
+if (hasProperty("ARTIFACT_ID")) {
+    artifactname = property("ARTIFACT_ID").toString()
+}
 
-val groupname = group.toString()
+version = "0.0.0".toString()
+if (hasProperty("ARTIFACT_VERSION")) {
+    version = property("ARTIFACT_VERSION").toString()
+}
+
 val localreponame = "Project"
 val repodir = "repo"
 
@@ -24,12 +32,9 @@ repositories {
 }
 
 dependencies {
-
     implementation("org.slf4j:slf4j-api:2.0.13")
-    
     testImplementation("ch.qos.logback:logback-core:1.5.6")
     testImplementation("ch.qos.logback:logback-classic:1.5.6")
-    
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -59,7 +64,7 @@ tasks.register<Copy>("exportFromLocalRepo"){
     dependsOn(tasks.clean)
     dependsOn(tasks.get("publish" + artifactname.replaceFirstChar(Char::titlecase) + "PublicationTo" + localreponame + "Repository"))
     
-    from(layout.buildDirectory.dir(repodir + "/" + groupname.replace(".", "/") + "/" + artifactname + "/" + version))
+    from(layout.buildDirectory.dir(repodir + "/" + project.getGroup().toString().replace(".", "/") + "/" + artifactname + "/" + version))
     
     include(artifactname + "-" + version + ".jar")
     include(artifactname + "-" + version + "-javadoc.jar")
