@@ -32,10 +32,18 @@ repositories {
 }
 
 dependencies {
-    implementation("org.slf4j:slf4j-api:2.0.13")
-    testImplementation("ch.qos.logback:logback-core:1.5.6")
-    testImplementation("ch.qos.logback:logback-classic:1.5.6")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation("org.slf4j:slf4j-api:2.0.16")
+
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-core
+    testImplementation("ch.qos.logback:logback-core:1.5.8")
+
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    testImplementation("ch.qos.logback:logback-classic:1.5.8")
+
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
