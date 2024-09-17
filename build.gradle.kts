@@ -22,11 +22,6 @@ if (hasProperty("ARTIFACT_VERSION")) {
 val localreponame = "Project"
 val repodir = "repo"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
 repositories {
     mavenCentral()
 }
@@ -48,6 +43,8 @@ dependencies {
 }
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     withSourcesJar()
     withJavadocJar()
 }
