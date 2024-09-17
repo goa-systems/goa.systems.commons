@@ -3,13 +3,13 @@ run-name: Build commons project
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "release/*"]
   workflow_dispatch:
 
 env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
-  ARTIFACT_VERSION: 0.7.0
+  ARTIFACT_VERSION: 0.8.0
 
 jobs:
   build-commons-lib:
@@ -39,3 +39,7 @@ jobs:
           ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
           ssh foo@tools.goa.systems "rm /tmp/$FILENAME"
         if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Publish prerelease
+        run: |
+          echo "Publishing prerelease"
+        if: ${{ github.ref == 'refs/heads/release/*' }}
