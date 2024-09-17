@@ -3,7 +3,7 @@ run-name: Build commons project
 
 on:
   push:
-    branches: ["main", "release/**"]
+    branches: ["main"]
   workflow_dispatch:
 
 env:
@@ -39,6 +39,3 @@ jobs:
           ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
           ssh foo@tools.goa.systems "rm /tmp/$FILENAME"
         if: ${{ github.ref == 'refs/heads/main' }}
-      - name: Creating prerelease
-        if: startsWith(github.ref, 'refs/heads/release/') && contains(github.ref, '/[0-9].[0-9].[0-9]')
-        run: echo "Running on a release branch."
