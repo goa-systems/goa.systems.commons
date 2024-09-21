@@ -15,9 +15,15 @@ class TimeCalcTests {
 
 		TimeCalc tc = new TimeCalc();
 
+		TimeUnit start = new TimeUnit(0, 0, 0);
+		TimeUnit end = new TimeUnit(0, 0, 50);
+
 		assertDoesNotThrow(() -> {
 			assertEquals(10, tc.calcTimeDifference(0, 10));
 			assertEquals(10, tc.calcTimeDifference(100, 110));
+
+			assertEquals(1, tc.calcTimeDifference(start, end));
+
 		});
 
 		assertDoesNotThrow(() -> {
@@ -33,6 +39,9 @@ class TimeCalcTests {
 
 		TimeCalc tc = new TimeCalc();
 
+		TimeUnit start = new TimeUnit(0, 0, 2);
+		TimeUnit end = new TimeUnit(0, 0, 1);
+
 		assertThrows(TimeCalculationException.class, () -> {
 			tc.calcTimeDifference(10, 5);
 		});
@@ -42,6 +51,10 @@ class TimeCalcTests {
 			var et = new GregorianCalendar();
 			et.setTimeInMillis(st.getTimeInMillis() - 600);
 			tc.calcTimeDifference(st.getTimeInMillis(), et.getTimeInMillis());
+		});
+
+		assertThrows(TimeCalculationException.class, () -> {
+			tc.calcTimeDifference(start, end);
 		});
 	}
 }

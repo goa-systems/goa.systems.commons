@@ -42,10 +42,20 @@ public class TimeUnit {
 		this.seconds = seconds;
 	}
 
+	/**
+	 * Transforms the contained hours, minutes and seconds into seconds only.
+	 * 
+	 * @return
+	 */
 	public long toSeconds() {
-		return (this.hours * 3600) + (this.minutes * 60) + this.seconds;
+		return (long) (this.hours * 3600) + (this.minutes * 60) + this.seconds;
 	}
 
+	/**
+	 * Transforms the given amount of seconds into the format HH:mm:ss.
+	 * 
+	 * @param seconds Seconds to convert
+	 */
 	public void fromSeconds(long seconds) {
 		this.seconds = Math.toIntExact(seconds % 60);
 		seconds = seconds - this.seconds;
