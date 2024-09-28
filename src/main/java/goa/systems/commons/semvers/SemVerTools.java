@@ -62,7 +62,7 @@ public class SemVerTools {
 
 	/**
 	 * Gets the highest version but formats it as a string. The same restrictions as
-	 * for getLatestVersion(List<Integer[]> versions) apply to this function.
+	 * for getLatestVersion(List&lt;Integer[]&gt; versions) apply to this function.
 	 * 
 	 * @param versions List of versions.
 	 * @return The highest version.
