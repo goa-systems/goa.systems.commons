@@ -49,10 +49,11 @@ public class SemVerTools {
 		if (currentversion[0] > latestversion[0]) {
 			return currentversion;
 		} else {
-			if (currentversion[1] > latestversion[1]) {
+			if (currentversion[0].equals(latestversion[0]) && currentversion[1] > latestversion[1]) {
 				return currentversion;
 			} else {
-				if (currentversion[2] > latestversion[2]) {
+				if (currentversion[0].equals(latestversion[0]) && currentversion[0].equals(latestversion[1])
+						&& currentversion[2] > latestversion[2]) {
 					return currentversion;
 				}
 			}
