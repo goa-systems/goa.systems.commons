@@ -20,13 +20,3 @@ dependencies {
 	api 'goa.systems:commons:{version}'
 }
 ```
-
-## Changelog
-
-|Version|Description|
-|-|-|
-|0.6.0|Adding partition calculation logic and dimension calculator.|
-|0.5.1|Migrating to Kotlin based Gradle scripts.|
-|0.5.0|Adding logic.|
-|0.4.0|Adding logic to make a given string valid.|
-|0.3.1|Migration to GitHub complete. Dependency updates.|
