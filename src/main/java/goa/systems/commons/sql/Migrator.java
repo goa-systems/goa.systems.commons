@@ -63,13 +63,27 @@ public class Migrator {
 		return version;
 	}
 
+	public String[] getCommands(String version) {
+		logger.info("Running database checks.");
+		InputStream versionstream = Migrator.class.getResourceAsStream(String.format("/sql/%s.sql", version));
+		if (versionstream != null) {
+			String sql = InputOutput.readString(versionstream);
+			return sql.split("\\n--\\n|\\n--(.*)--\\n");
+		} else {
+			logger.warn("Can not find input stream.");
+			return new String[] {};
+		}
+	}
+
 	public void applyCommandsForVersion(String version) {
+		String[] commands = getCommands(version);
 		logger.info("Migrating to version {}", version);
 		try (Connection c = this.ds.getConnection(); Statement s = c.createStatement();) {
-			InputStream versionstream = Migrator.class.getResourceAsStream(String.format("/sql/%s.sql", version));
-			String sql = InputOutput.readString(versionstream);
-			s.addBatch(sql);
+			for (String command : commands) {
+				s.addBatch(command);
+			}
 			s.executeBatch();
+			c.commit();
 		} catch (SQLException e) {
 			logger.error("Error executing statement.", e);
 		}
