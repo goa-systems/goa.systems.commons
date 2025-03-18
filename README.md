@@ -6,7 +6,7 @@ A library containing common code snippets to reduce duplicate implementations of
 
 ## Compatibility
 
-JDK >= 11
+JDK >= 17
 
 ## Usage
 The file `build.gradle` in your project should contain
