@@ -83,7 +83,6 @@ public class Migrator {
 				s.addBatch(command);
 			}
 			s.executeBatch();
-			c.commit();
 		} catch (SQLException e) {
 			logger.error("Error executing statement.", e);
 		}
