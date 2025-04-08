@@ -62,21 +62,7 @@ jobs:
       - name: Prepare Gradle
         id: preparegradle
         run: |
-          BASE_DIR="${HOME}/.local/programs/gradle"
-          DIRNAME=gradle-${GRADLEVERSION}
-          PACKAGE=${DIRNAME}-bin
-          APP_DIR="${BASE_DIR}/${DIRNAME}"
-          if [ ! -d "${BASE_DIR}" ]; then mkdir -p "$BASE_DIR"; fi
-          if [ ! -d "${APP_DIR}" ]
-          then
-              wget -O "${HOME}/gradle.zip" -q "https://downloads.gradle.org/distributions/${PACKAGE}.zip"
-              unzip -q "${HOME}/gradle.zip" -d "${BASE_DIR}"
-              rm "${HOME}/gradle.zip"
-          else
-              echo "Gradle already installed."
-          fi
-          echo "GRADLEVERSION=${GRADLEVERSION}" >> $GITHUB_OUTPUT
-          echo "GRADLE_HOME=${APP_DIR}" >> $GITHUB_ENV
+          curl -s "https://raw.githubusercontent.com/goa-systems/automation/refs/heads/main/bash/gradle.sh" | bash -s
 
       - name: Build distribution
         run: |
