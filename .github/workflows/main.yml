@@ -9,35 +9,43 @@ on:
 env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
-  ARTIFACT_VERSION: 0.9.0
+  ARTIFACT_VERSION: 0.10.0
 
 jobs:
   build-commons-lib:
-    runs-on: self-hosted
+    runs-on: build
     steps:
       - name: Set permissions
-        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+        run: |
+          # docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+        
       - name: Checkout project
         uses: actions/checkout@v4
+        
       - name: Build distribution
-        run: docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
+        run: |
+          # docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
+        
       - name: Set permissions
-        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+        run: |
+          # docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+        
       - name: Analyze project
         run: | 
-          docker run \
-          --rm \
-          -v "${PWD}:/usr/src" \
-          -e SONAR_SCANNER_OPTS="-Dsonar.host.url=${{ vars.SQSERVER }} -Dsonar.token=${{ secrets.SQTOKEN }} -Dsonar.projectKey=goa.systems.commons -Dsonar.sources=src/main -Dsonar.java.libraries=build/libs -Dsonar.java.binaries=build/classes -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml -Dsonar.junit.reportsPath=build/test-results -Xdiag" \
-          --network host \
-          sonarsource/sonar-scanner-cli
+          # docker run \
+          # --rm \
+          # -v "${PWD}:/usr/src" \
+          # -e SONAR_SCANNER_OPTS="-Dsonar.host.url=${{ vars.SQSERVER }} -Dsonar.token=${{ secrets.SQTOKEN }} -Dsonar.projectKey=goa.systems.commons -Dsonar.sources=src/main -Dsonar.java.libraries=build/libs -Dsonar.java.binaries=build/classes -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml -Dsonar.junit.reportsPath=build/test-results -Xdiag" \
+          # --network host \
+          # sonarsource/sonar-scanner-cli
         if: ${{ github.ref == 'refs/heads/main' }}
+        
       - name: Publish artifact
         run: |
-          FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
-          ssh-keyscan tools.goa.systems 1> .known_hosts 2> /dev/null
-          scp -o UserKnownHostsFile=".known_hosts" build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
-          ssh -o UserKnownHostsFile=".known_hosts" foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
-          ssh -o UserKnownHostsFile=".known_hosts" foo@tools.goa.systems "rm /tmp/$FILENAME"
-          rm .known_hosts
+          # FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
+          # ssh-keyscan tools.goa.systems 1> .known_hosts 2> /dev/null
+          # scp -o UserKnownHostsFile=".known_hosts" build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
+          # ssh -o UserKnownHostsFile=".known_hosts" foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
+          # ssh -o UserKnownHostsFile=".known_hosts" foo@tools.goa.systems "rm /tmp/$FILENAME"
+          # rm .known_hosts
         if: ${{ github.ref == 'refs/heads/main' }}
