@@ -12,13 +12,19 @@ env:
   ARTIFACT_VERSION: "0.10.0-rc-${{ github.run_number }}"
 
 jobs:
+
   build-commons-lib:
+
     runs-on: build
+
+    env:
+      JAVAVERSION: 23.0.2
+      ZULUVERSION: 23.32.11
+      SONARVERSION: 7.0.2.4839
+      GRADLEVERSION: 8.13
+
     steps:
-      - name: Set permissions
-        run: |
-          # docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
-      
+
       - name: Checkout project
         uses: actions/checkout@v4
 
@@ -62,12 +68,9 @@ jobs:
 
       - name: Build distribution
         run: |
-          # docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
-      
-      - name: Set permissions
-        run: |
-          # docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
-      
+          PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${SONARQUBE_HOME}/bin:${PATH}"
+          gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
+
       - name: Publish artifact
         run: |
           # FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
