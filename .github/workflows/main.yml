@@ -25,10 +25,7 @@ jobs:
       GRADLEVERSION: 8.13
 
     steps:
-      - name: Set permissions
-        run: |
-          # docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
-        
+
       - name: Checkout project
         uses: actions/checkout@v4
 
@@ -47,6 +44,7 @@ jobs:
           else
               echo "Java already installed."
           fi
+          echo "JAVA_HOME=${JDK_DIR}" >> $GITHUB_ENV
 
       - name: Prepare Gradle
         id: preparegradle
@@ -69,6 +67,7 @@ jobs:
           else
               echo "SonarQube scanner already installed."
           fi
+          echo "SONARQUBE_HOME=${APP_DIR}" >> $GITHUB_ENV
         
       - name: Build distribution
         run: |
