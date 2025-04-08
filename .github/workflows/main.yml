@@ -21,6 +21,44 @@ jobs:
         
       - name: Checkout project
         uses: actions/checkout@v4
+
+      - name: Prepare Java
+        id: preparejava
+        run: |
+          APP_DIR="${HOME}/.local/programs/java"
+          JAVA_PACKAGE=zulu${ZULUVERSION}-ca-fx-jdk${JAVAVERSION}-linux_x64
+          JDK_DIR="${APP_DIR}/${JAVA_PACKAGE}"
+          if [ ! -d "${JDK_DIR}" ]
+          then
+              mkdir -p "$APP_DIR"
+              wget -O "${HOME}/java.tar.gz" -q "https://cdn.azul.com/zulu/bin/${JAVA_PACKAGE}.tar.gz"
+              tar -x -f "${HOME}/java.tar.gz" -C "${APP_DIR}"
+              rm "${HOME}/java.tar.gz"
+          else
+              echo "Java already installed."
+          fi
+          echo "JAVAVERSION=${JAVAVERSION}" >> $GITHUB_OUTPUT
+          echo "ZULUVERSION=${ZULUVERSION}" >> $GITHUB_OUTPUT
+          echo "JAVA_HOME=${JDK_DIR}" >> $GITHUB_ENV
+
+      - name: Prepare Gradle
+        id: preparegradle
+        run: |
+          BASE_DIR="${HOME}/.local/programs/gradle"
+          DIRNAME=gradle-${GRADLEVERSION}
+          PACKAGE=${DIRNAME}-bin
+          APP_DIR="${BASE_DIR}/${DIRNAME}"
+          if [ ! -d "${BASE_DIR}" ]; then mkdir -p "$BASE_DIR"; fi
+          if [ ! -d "${APP_DIR}" ]
+          then
+              wget -O "${HOME}/gradle.zip" -q "https://downloads.gradle.org/distributions/${PACKAGE}.zip"
+              unzip -q "${HOME}/gradle.zip" -d "${BASE_DIR}"
+              rm "${HOME}/gradle.zip"
+          else
+              echo "Gradle already installed."
+          fi
+          echo "GRADLEVERSION=${GRADLEVERSION}" >> $GITHUB_OUTPUT
+          echo "GRADLE_HOME=${APP_DIR}" >> $GITHUB_ENV
         
       - name: Build distribution
         run: |
