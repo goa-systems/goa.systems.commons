@@ -9,6 +9,8 @@ env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
   ARTIFACT_VERSION: "0.10.0-rc-${{ github.run_number }}"
+  DIST_SERVER: tools.goa.systems
+  DIST_USER: foo
 
 jobs:
 
