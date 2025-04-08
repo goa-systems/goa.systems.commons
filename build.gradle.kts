@@ -40,6 +40,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+    testImplementation("org.xerial:sqlite-jdbc:3.49.1.0")
 }
 
 java {
