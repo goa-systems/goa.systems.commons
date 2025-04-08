@@ -1,5 +1,4 @@
-name: build-commons-project
-run-name: Build commons project
+name: build-main
 
 on:
   push:
@@ -12,8 +11,17 @@ env:
   ARTIFACT_VERSION: 0.10.0
 
 jobs:
+
   build-commons-lib:
+
     runs-on: build
+
+    env:
+      JAVAVERSION: 23.0.2
+      ZULUVERSION: 23.32.11
+      SONARVERSION: 7.0.2.4839
+      GRADLEVERSION: 8.13
+
     steps:
       - name: Set permissions
         run: |
