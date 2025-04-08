@@ -55,6 +55,7 @@ jobs:
           else
               echo "Java already installed."
           fi
+          echo "JAVA_HOME=${JDK_DIR}" >> $GITHUB_ENV
 
       - name: Prepare Gradle
         id: preparegradle
@@ -63,7 +64,7 @@ jobs:
 
       - name: Build distribution
         run: |
-          PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${SONARQUBE_HOME}/bin:${PATH}"
+          PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${PATH}"
           gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
 
       - name: Publish artifact
