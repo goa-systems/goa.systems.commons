@@ -55,9 +55,6 @@ jobs:
           else
               echo "Java already installed."
           fi
-          echo "JAVAVERSION=${JAVAVERSION}" >> $GITHUB_OUTPUT
-          echo "ZULUVERSION=${ZULUVERSION}" >> $GITHUB_OUTPUT
-          echo "JAVA_HOME=${JDK_DIR}" >> $GITHUB_ENV
 
       - name: Prepare Gradle
         id: preparegradle
@@ -72,7 +69,7 @@ jobs:
       - name: Publish artifact
         run: |
           FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
-          scp -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
+          scp -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} build/distributions/$FILENAME ${DIST_USER}@${DIST_SERVER}:/tmp/$FILENAME
           ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
           ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "rm /tmp/$FILENAME"
 
