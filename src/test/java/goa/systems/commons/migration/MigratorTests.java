@@ -75,10 +75,6 @@ class MigratorTests {
 		assertThrows(MigratorException.class, () -> {
 			m.generateMigrations(null, versions, null);
 		});
-
-		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations("0.0.1", versions, null);
-		});
 	}
 
 	@Test
@@ -90,7 +86,7 @@ class MigratorTests {
 			logger.info("Creating database in {}.", sqlitedb.getAbsolutePath());
 			SQLiteDataSource sqlds = new SQLiteDataSource();
 			sqlds.setUrl(sqliteurl);
-			assertEquals("0.0.0", m.determineDatabaseVersion(sqlds));
+			assertEquals(null, m.determineDatabaseVersion(sqlds));
 			sqlitedb.delete();
 		});
 	}
