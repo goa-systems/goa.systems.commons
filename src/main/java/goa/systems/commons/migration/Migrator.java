@@ -20,6 +20,8 @@ public class Migrator {
 
 	private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
 
+	private String determineDatabaseVersionCommand = "SELECT `value` FROM `Settings` WHERE key = 'databaseversion'";
+
 	/**
 	 * Migrates the database to the current application version.
 	 * 
@@ -62,7 +64,7 @@ public class Migrator {
 		DatabaseVersion version = new DatabaseVersion();
 		try (Connection c = datasource.getConnection();
 				Statement stm = c.createStatement();
-				ResultSet rs = stm.executeQuery("SELECT `value` FROM `settings` WHERE key = 'databaseversion'")) {
+				ResultSet rs = stm.executeQuery(determineDatabaseVersionCommand)) {
 			if (rs.next()) {
 				version.setVersion(rs.getString(1));
 			}
@@ -144,5 +146,13 @@ public class Migrator {
 			i++;
 		}
 		return j;
+	}
+
+	/**
+	 * Allows setting the SQL command to determine the database version. It must provide a single column and line of string type.
+	 * @param determineDatabaseVersionCommand
+	 */
+	public void setDetermineDatabaseVersionCommand(String determineDatabaseVersionCommand) {
+		this.determineDatabaseVersionCommand = determineDatabaseVersionCommand;
 	}
 }
