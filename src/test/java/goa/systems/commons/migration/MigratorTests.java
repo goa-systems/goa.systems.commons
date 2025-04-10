@@ -43,37 +43,38 @@ class MigratorTests {
 		String[] versions = new String[] { "0.0.0", "0.0.1", "0.0.2", "0.1.0", "0.1.1", "0.5.6-test" };
 
 		assertDoesNotThrow(() -> {
-			List<String> steps = m.generateMigrations("0.0.2", versions, "0.0.1");
+			List<String> steps = m.generateMigrations("0.0.2", versions, new DatabaseVersion("0.0.1"));
 			assertEquals(1, steps.size());
 		});
 
 		assertDoesNotThrow(() -> {
-			List<String> steps = m.generateMigrations("0.5.6-test", versions, "0.0.0");
+			List<String> steps = m.generateMigrations("0.5.6-test", versions, new DatabaseVersion("0.0.0"));
 			assertEquals(5, steps.size());
 		});
 
 		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations("0.0.1", versions, "0.0.2");
+			m.generateMigrations("0.0.1", versions, new DatabaseVersion("0.0.2"));
 		});
 
 		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations("", versions, "0.0.2");
+			m.generateMigrations("", versions, new DatabaseVersion("0.0.2"));
+		});
+
+		assertDoesNotThrow(() -> {
+			List<String> v = m.generateMigrations("0.0.1", versions, new DatabaseVersion(""));
+			assertEquals(versions.length, v.size());
 		});
 
 		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations("0.0.1", versions, "");
+			m.generateMigrations("", versions, new DatabaseVersion(""));
 		});
 
 		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations("", versions, "");
+			m.generateMigrations(null, versions, new DatabaseVersion("0.0.2"));
 		});
 
 		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations(null, versions, "0.0.2");
-		});
-
-		assertThrows(MigratorException.class, () -> {
-			m.generateMigrations(null, versions, null);
+			m.generateMigrations(null, versions, new DatabaseVersion(null));
 		});
 	}
 

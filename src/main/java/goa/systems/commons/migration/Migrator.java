@@ -32,7 +32,7 @@ public class Migrator {
 	 */
 	public void migrate(DataSource datasource, String resbase, String applicationversion, String[] versions)
 			throws MigratorException {
-		String databaseversion = determineDatabaseVersion(datasource);
+		DatabaseVersion databaseversion = determineDatabaseVersion(datasource);
 		List<String> migrations = generateMigrations(applicationversion, versions, databaseversion);
 		for (String m : migrations) {
 			String sql = InputOutput
@@ -55,16 +55,16 @@ public class Migrator {
 	 * Determine database version based on settings table.
 	 * 
 	 * @param datasource DataSource to work with.
-	 * @return The current database version or null in case of error.
+	 * @return The current version as DatabaseVersion object.
 	 */
-	public String determineDatabaseVersion(DataSource datasource) {
+	public DatabaseVersion determineDatabaseVersion(DataSource datasource) {
 
-		String version = null;
+		DatabaseVersion version = new DatabaseVersion();
 		try (Connection c = datasource.getConnection();
 				Statement stm = c.createStatement();
 				ResultSet rs = stm.executeQuery("SELECT `value` FROM `settings` WHERE key = 'databaseversion'")) {
 			if (rs.next()) {
-				version = rs.getString(1);
+				version.setVersion(rs.getString(1));
 			}
 		} catch (SQLException e) {
 			logger.error("Settings table most likely does not exist. Assuming empty database.");
@@ -80,44 +80,50 @@ public class Migrator {
 	 * @param databaseversion    Database version string.
 	 * @throws MigratorException In case of error.
 	 */
-	public List<String> generateMigrations(String applicationversion, String[] versions, String databaseversion)
-			throws MigratorException {
+	public List<String> generateMigrations(String applicationversion, String[] versions,
+			DatabaseVersion databaseversion) throws MigratorException {
 
 		List<String> steps = new ArrayList<>();
 
-		if (applicationversion == null || applicationversion.isEmpty() || versions == null || versions.length == 0) {
+		if (applicationversion == null || applicationversion.isEmpty() || versions == null || versions.length == 0
+				|| databaseversion == null) {
 			throw new MigratorException("Provided data is not valid.");
 		}
 
-		int applicationindex = getIndex(applicationversion, versions);
-		int databaseindex = databaseversion == null ? 0 : getIndex(databaseversion, versions);
-
-		if (applicationindex == -1 || databaseindex == -1) {
-			throw new MigratorException(
-					"Application version index or database version index not found in list of versions.");
-		}
-
-		if (databaseindex > applicationindex) {
-			throw new MigratorException("Database is newer than application.");
-		}
-
-		int distance = applicationindex - databaseindex;
-
-		if (distance == 0) {
-			logger.info("Database is on the same version as application. No migration needed.");
+		/* If database is not set up at all, run all migrations. */
+		if (!databaseversion.isInitialized()) {
+			Collections.addAll(steps, versions);
 		} else {
-			logger.info("Database is {} {} behind application. Starting migration.", distance,
-					distance == 1 ? "version" : "versions");
-			int startindex = databaseversion == null ? 0 : databaseindex + 1;
-			Collections.addAll(steps, Arrays.copyOfRange(versions, startindex, applicationindex + 1));
-		}
 
+			int applicationindex = getIndex(applicationversion, versions);
+			int databaseindex = databaseversion == null ? 0 : getIndex(databaseversion.getVersion(), versions);
+
+			if (applicationindex == -1 || databaseindex == -1) {
+				throw new MigratorException(
+						"Application version index or database version index not found in list of versions.");
+			}
+
+			if (databaseindex > applicationindex) {
+				throw new MigratorException("Database is newer than application.");
+			}
+
+			int distance = applicationindex - databaseindex;
+
+			if (distance == 0) {
+				logger.info("Database is on the same version as application. No migration needed.");
+			} else {
+				logger.info("Database is {} {} behind application. Starting migration.", distance,
+						distance == 1 ? "version" : "versions");
+				int startindex = databaseversion == null ? 0 : databaseindex + 1;
+				Collections.addAll(steps, Arrays.copyOfRange(versions, startindex, applicationindex + 1));
+			}
+		}
 		return steps;
 	}
 
 	/**
 	 * Returns the index of the given version in the list of versions or -1 if it
-	 * was not found or if an error occured.
+	 * was not found or if an error occurred.
 	 * 
 	 * @param version  Version to look for.
 	 * @param versions List of versions to search.
