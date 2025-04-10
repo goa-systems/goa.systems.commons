@@ -37,7 +37,7 @@ public class Migrator {
 		for (String m : migrations) {
 			String sql = InputOutput
 					.readString(Migrator.class.getResourceAsStream(String.format("%s/%s.sql", resbase, m)));
-			String[] sqlcmds = sql.split("\\n\\s*--.*\\n");
+			String[] sqlcmds = sql.split("(\\n|\\r\\n)\\s*--.*(\\n|\\r\\n)");
 			try (Connection c = datasource.getConnection(); Statement s = c.createStatement();) {
 				for (String sqlcmd : sqlcmds) {
 					s.addBatch(sqlcmd);
