@@ -48,7 +48,7 @@ jobs:
           JDK_DIR="${APP_DIR}/${JAVA_PACKAGE}"
           if [ ! -d "${JDK_DIR}" ]
           then
-              mkdir -p "$APP_DIR"
+              mkdir -p "${APP_DIR}"
               wget -O "${HOME}/java.tar.gz" -q "https://cdn.azul.com/zulu/bin/${JAVA_PACKAGE}.tar.gz"
               tar -x -f "${HOME}/java.tar.gz" -C "${APP_DIR}"
               rm "${HOME}/java.tar.gz"
@@ -65,16 +65,16 @@ jobs:
       - name: Build distribution
         run: |
           PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${PATH}"
-          FULL_ARTIFACT_VERSION="$ARTIFACT_VERSION-$(git rev-parse --short ${{ github.sha }})"
-          gradle -PARTIFACT_VERSION="$FULL_ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
+          FULL_ARTIFACT_VERSION="${ARTIFACT_VERSION}-$(git rev-parse --short ${{ github.sha }})"
+          gradle -PARTIFACT_VERSION="${FULL_ARTIFACT_VERSION}" -PARTIFACT_GROUP="${ARTIFACT_GROUP}" -PARTIFACT_ID="${ARTIFACT_ID}" clean distribute
           echo "FULL_ARTIFACT_VERSION=${FULL_ARTIFACT_VERSION}" >> $GITHUB_ENV
 
       - name: Publish artifact
         run: |
           FILENAME=$ARTIFACT_ID-${FULL_ARTIFACT_VERSION}.tar.gz
-          scp -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} build/distributions/$FILENAME ${DIST_USER}@${DIST_SERVER}:/tmp/$FILENAME
-          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "${FULL_ARTIFACT_VERSION}"
-          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "rm /tmp/$FILENAME"
+          scp -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} build/distributions/$FILENAME ${DIST_USER}@${DIST_SERVER}:/tmp/${FILENAME}
+          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "bash -s" < ".github/scripts/deploymaven" "/tmp/${FILENAME}" "${ARTIFACT_GROUP}" "${ARTIFACT_ID}" "${FULL_ARTIFACT_VERSION}"
+          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "rm /tmp/${FILENAME}"
 
       - name: Clean up
         run: |
