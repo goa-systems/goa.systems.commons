@@ -8,7 +8,7 @@ on:
 env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
-  ARTIFACT_VERSION: "0.10.0-rc-"
+  ARTIFACT_VERSION: "0.10.0-rc"
   DIST_SERVER: tools.goa.systems
   DIST_USER: foo
 
