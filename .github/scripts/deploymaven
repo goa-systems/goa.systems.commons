@@ -72,7 +72,7 @@ tar -x -f "${DIST}" -C "${DIR}"
 
 ARTIFACTS_BASEPATH="${DIR}/${ARTIFACT}-${VERSION}"
 
-mvn deploy:deploy-file \
+mvn -X deploy:deploy-file \
  -Dfile="${ARTIFACTS_BASEPATH}.jar" \
  -Dsources="${ARTIFACTS_BASEPATH}-sources.jar" \
  -Djavadoc="${ARTIFACTS_BASEPATH}-javadoc.jar" \
