@@ -101,7 +101,7 @@ public class Migrator {
 		} else {
 
 			int applicationindex = getIndex(applicationversion, versions);
-			int databaseindex = databaseversion == null ? 0 : getIndex(databaseversion.getVersion(), versions);
+			int databaseindex = getIndex(databaseversion.getVersion(), versions);
 
 			if (applicationindex == -1 || databaseindex == -1) {
 				throw new MigratorException(
@@ -119,7 +119,7 @@ public class Migrator {
 			} else {
 				logger.info("Database is {} {} behind application. Starting migration.", distance,
 						distance == 1 ? "version" : "versions");
-				int startindex = databaseversion == null ? 0 : databaseindex + 1;
+				int startindex = databaseindex + 1;
 				Collections.addAll(steps, Arrays.copyOfRange(versions, startindex, applicationindex + 1));
 			}
 		}
