@@ -25,7 +25,7 @@ class MigratorTests {
 	@Test
 	void testIndex() {
 
-		Migrator m = new Migrator();
+		Migrator m = new Migrator(null);
 		String[] versions = new String[] { "0.0.0", "0.0.1", "0.0.2", "0.1.0", "0.1.1", "0.5.6-test" };
 		assertEquals(0, m.getIndex("0.0.0", versions));
 		assertEquals(1, m.getIndex("0.0.1", versions));
@@ -39,7 +39,7 @@ class MigratorTests {
 	@Test
 	void testStepGenerator() {
 
-		Migrator m = new Migrator();
+		Migrator m = new Migrator(null);
 		String[] versions = new String[] { "0.0.0", "0.0.1", "0.0.2", "0.1.0", "0.1.1", "0.5.6-test" };
 
 		assertDoesNotThrow(() -> {
@@ -82,12 +82,12 @@ class MigratorTests {
 	void testVersionDetermination() {
 		File sqlitedb = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
 		var sqliteurl = String.format("jdbc:sqlite:%s", sqlitedb.getAbsolutePath());
-		Migrator m = new Migrator();
 		assertDoesNotThrow(() -> {
 			logger.info("Creating database in {}.", sqlitedb.getAbsolutePath());
 			SQLiteDataSource sqlds = new SQLiteDataSource();
 			sqlds.setUrl(sqliteurl);
-			assertEquals(null, m.determineDatabaseVersion(sqlds));
+			Migrator m = new Migrator(sqlds);
+			assertEquals(null, m.determineDatabaseVersion());
 			sqlitedb.delete();
 		});
 	}
@@ -96,16 +96,16 @@ class MigratorTests {
 	void testMigration() {
 		File sqlitedb = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
 		var sqliteurl = String.format("jdbc:sqlite:%s", sqlitedb.getAbsolutePath());
-		Migrator m = new Migrator();
 		assertDoesNotThrow(() -> {
 			logger.info("Creating database in {}.", sqlitedb.getAbsolutePath());
 			SQLiteDataSource sqlds = new SQLiteDataSource();
+			Migrator m = new Migrator(sqlds);
 			sqlds.setUrl(sqliteurl);
 			String base = "/migratortests";
 			String[] versions = InputOutput
 					.readString(MigratorTests.class.getResourceAsStream(String.format("%s/versions", base)))
 					.split("\\n");
-			m.migrate(sqlds, base, "0.0.3", versions);
+			m.migrate(base, "0.0.3", versions);
 
 			Connection con = sqlds.getConnection();
 			Statement s = con.createStatement();

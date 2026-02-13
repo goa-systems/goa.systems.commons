@@ -22,6 +22,12 @@ public class Migrator {
 
 	private String determineDatabaseVersionCommand = "SELECT `value` FROM `Settings` WHERE key = 'databaseversion'";
 
+	private DataSource datasource;
+
+	public Migrator(DataSource datasource) {
+		this.datasource = datasource;
+	}
+
 	/**
 	 * Migrates the database to the current application version.
 	 * 
@@ -32,15 +38,14 @@ public class Migrator {
 	 * @param versions           Defined list of application versions.
 	 * @throws MigratorException
 	 */
-	public void migrate(DataSource datasource, String resbase, String applicationversion, String[] versions)
-			throws MigratorException {
-		DatabaseVersion databaseversion = determineDatabaseVersion(datasource);
+	public void migrate(String resbase, String applicationversion, String[] versions) throws MigratorException {
+		DatabaseVersion databaseversion = determineDatabaseVersion();
 		List<String> migrations = generateMigrations(applicationversion, versions, databaseversion);
 		for (String m : migrations) {
 			String sql = InputOutput
 					.readString(Migrator.class.getResourceAsStream(String.format("%s/%s.sql", resbase, m)));
 			String[] sqlcmds = sql.split("(\\n|\\r\\n)\\s*--.*(\\n|\\r\\n)");
-			try (Connection c = datasource.getConnection(); Statement s = c.createStatement();) {
+			try (Connection c = this.datasource.getConnection(); Statement s = c.createStatement();) {
 				for (String sqlcmd : sqlcmds) {
 					s.addBatch(sqlcmd);
 					logger.debug("Adding {} to batch.", sqlcmd);
@@ -59,10 +64,10 @@ public class Migrator {
 	 * @param datasource DataSource to work with.
 	 * @return The current version as DatabaseVersion object.
 	 */
-	public DatabaseVersion determineDatabaseVersion(DataSource datasource) {
+	public DatabaseVersion determineDatabaseVersion() {
 
 		DatabaseVersion version = new DatabaseVersion();
-		try (Connection c = datasource.getConnection();
+		try (Connection c = this.datasource.getConnection();
 				Statement stm = c.createStatement();
 				ResultSet rs = stm.executeQuery(determineDatabaseVersionCommand)) {
 			if (rs.next()) {
@@ -149,7 +154,9 @@ public class Migrator {
 	}
 
 	/**
-	 * Allows setting the SQL command to determine the database version. It must provide a single column and line of string type.
+	 * Allows setting the SQL command to determine the database version. It must
+	 * provide a single column and line of string type.
+	 * 
 	 * @param determineDatabaseVersionCommand
 	 */
 	public void setDetermineDatabaseVersionCommand(String determineDatabaseVersionCommand) {

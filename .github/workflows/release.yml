@@ -19,10 +19,10 @@ jobs:
     runs-on: build
 
     env:
-      JAVAVERSION: 23.0.2
-      ZULUVERSION: 23.32.11
-      SONARVERSION: 7.0.2.4839
-      GRADLEVERSION: 8.13
+        JAVAVERSION: 25.0.2
+        ZULUVERSION: 25.32.21
+        SONARVERSION: 8.0.1.6346
+        GRADLEVERSION: 9.3.1
 
     steps:
 
