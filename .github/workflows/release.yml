@@ -10,7 +10,7 @@ env:
   ARTIFACT_ID: "commons"
   ARTIFACT_VERSION: "0.10.0-rc"
   DIST_SERVER: tools.goa.systems
-  DIST_USER: foo
+  DIST_USER: svcdeploy
 
 jobs:
 
@@ -39,6 +39,7 @@ jobs:
           chmod 600 "${KEYFILE}"
           echo "KEYFILE=${KEYFILE}" >> $GITHUB_ENV
           echo "KNOWNHOSTSFILE=${KNOWNHOSTSFILE}" >> $GITHUB_ENV
+          ssh-keygen -y -f "${KEYFILE}"
 
       - name: Prepare Java
         id: preparejava
