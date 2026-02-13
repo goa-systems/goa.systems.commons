@@ -3,8 +3,8 @@
 # Checks and installs Java and Maven on demand.
 setup_env () {
 
-    local JAVAVERS="zulu21.40.17-ca-jdk21.0.6-linux_x64"
-    local MAVENVERS="3.9.9"
+    local JAVAVERS="zulu21.48.15-ca-jdk21.0.10-linux_x64"
+    local MAVENVERS="3.9.12"
     local MAVENDIST="apache-maven-${MAVENVERS}"
 
     local LOCALCACHEDIR="${HOME}/.buildtools"
