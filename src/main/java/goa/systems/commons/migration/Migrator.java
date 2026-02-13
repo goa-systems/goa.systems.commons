@@ -31,7 +31,6 @@ public class Migrator {
 	/**
 	 * Migrates the database to the current application version.
 	 * 
-	 * @param datasource         DataSource to work with.
 	 * @param resbase            Resource base in the class path where to find the
 	 *                           SQL scripts.
 	 * @param applicationversion Current application version.
@@ -61,7 +60,6 @@ public class Migrator {
 	/**
 	 * Determine database version based on settings table.
 	 * 
-	 * @param datasource DataSource to work with.
 	 * @return The current version as DatabaseVersion object.
 	 */
 	public DatabaseVersion determineDatabaseVersion() {
