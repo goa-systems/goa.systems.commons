@@ -70,6 +70,8 @@ DIR="/tmp/$(uuidgen)"
 mkdir "${DIR}"
 tar -x -f "${DIST}" -C "${DIR}"
 
+ls -alh "${DIR}"
+
 ARTIFACTS_BASEPATH="${DIR}/${ARTIFACT}-${VERSION}"
 
 mvn -X deploy:deploy-file \
