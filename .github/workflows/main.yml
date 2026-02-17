@@ -1,5 +1,4 @@
-name: build-commons-project
-run-name: Build commons project
+name: build-main
 
 on:
   push:
@@ -9,35 +8,88 @@ on:
 env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
-  ARTIFACT_VERSION: 0.9.0
+  ARTIFACT_VERSION: 0.10.0
+  DIST_SERVER: tools.goa.systems
+  DIST_USER: foo
 
 jobs:
+
   build-commons-lib:
-    runs-on: self-hosted
+
+    runs-on: build
+
+    env:
+      JAVAVERSION: 25.0.2
+      ZULUVERSION: 25.32.21
+      SONARVERSION: 8.0.1.6346
+      GRADLEVERSION: 9.3.1
+
     steps:
-      - name: Set permissions
-        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+
       - name: Checkout project
         uses: actions/checkout@v4
+
+      - name: Prepare Java
+        id: preparejava
+        run: |
+          APP_DIR="${HOME}/.local/programs/java"
+          JAVA_PACKAGE=zulu${ZULUVERSION}-ca-fx-jdk${JAVAVERSION}-linux_x64
+          JDK_DIR="${APP_DIR}/${JAVA_PACKAGE}"
+          if [ ! -d "${JDK_DIR}" ]
+          then
+              mkdir -p "$APP_DIR"
+              wget -O "${HOME}/java.tar.gz" -q "https://cdn.azul.com/zulu/bin/${JAVA_PACKAGE}.tar.gz"
+              tar -x -f "${HOME}/java.tar.gz" -C "${APP_DIR}"
+              rm "${HOME}/java.tar.gz"
+          else
+              echo "Java already installed."
+          fi
+          echo "JAVA_HOME=${JDK_DIR}" >> $GITHUB_ENV
+
+      - name: Prepare Gradle
+        id: preparegradle
+        run: |
+          curl -s "https://raw.githubusercontent.com/goa-systems/automation/refs/heads/main/bash/gradle.sh" | bash -s
+
+      - name: Prepare SonarQube scanner
+        id: preparesonar
+        run: |
+          BASE_DIR="${HOME}/.local/programs/sonarqube"
+          DIRNAME=sonar-scanner-${SONARVERSION}-linux-x64
+          PACKAGE=sonar-scanner-cli-${SONARVERSION}-linux-x64
+          APP_DIR="${BASE_DIR}/${DIRNAME}"
+          if [ ! -d "${BASE_DIR}" ]; then mkdir -p "$BASE_DIR"; fi
+          if [ ! -d "${APP_DIR}" ]
+          then
+              wget -O "${HOME}/sonarqube.zip" -q "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${PACKAGE}.zip"
+              unzip -q "${HOME}/sonarqube.zip" -d "${BASE_DIR}"
+              rm "${HOME}/sonarqube.zip"
+          else
+              echo "SonarQube scanner already installed."
+          fi
+          echo "SONARQUBE_HOME=${APP_DIR}" >> $GITHUB_ENV
+        
       - name: Build distribution
-        run: docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
-      - name: Set permissions
-        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+        run: |
+          PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${SONARQUBE_HOME}/bin:${PATH}"
+          gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
+
       - name: Analyze project
         run: | 
-          docker run \
-          --rm \
-          -v "${PWD}:/usr/src" \
-          -e SONAR_SCANNER_OPTS="-Dsonar.host.url=${{ vars.SQSERVER }} -Dsonar.token=${{ secrets.SQTOKEN }} -Dsonar.projectKey=goa.systems.commons -Dsonar.sources=src/main -Dsonar.java.libraries=build/libs -Dsonar.java.binaries=build/classes -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml -Dsonar.junit.reportsPath=build/test-results -Xdiag" \
-          --network host \
-          sonarsource/sonar-scanner-cli
-        if: ${{ github.ref == 'refs/heads/main' }}
+          PATH="${SONARQUBE_HOME}/bin:${PATH}"
+          sonar-scanner \
+          -Dsonar.host.url=${{ vars.SQSERVER }} \
+          -Dsonar.token=${{ secrets.SQTOKEN }} \
+          -Dsonar.projectKey=goa.systems.commons \
+          -Dsonar.sources=src/main \
+          -Dsonar.java.libraries=build/libs \
+          -Dsonar.java.binaries=build/classes \
+          -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
+          -Dsonar.junit.reportsPath=build/test-results
+        
       - name: Publish artifact
         run: |
           FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
-          ssh-keyscan tools.goa.systems 1> .known_hosts 2> /dev/null
-          scp -o UserKnownHostsFile=".known_hosts" build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
-          ssh -o UserKnownHostsFile=".known_hosts" foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
-          ssh -o UserKnownHostsFile=".known_hosts" foo@tools.goa.systems "rm /tmp/$FILENAME"
-          rm .known_hosts
-        if: ${{ github.ref == 'refs/heads/main' }}
+          scp -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} build/distributions/$FILENAME ${DIST_USER}@${DIST_SERVER}:/tmp/$FILENAME
+          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
+          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "rm /tmp/$FILENAME"

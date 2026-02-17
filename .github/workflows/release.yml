@@ -1,5 +1,4 @@
 name: build-release
-run-name: Build commons project rc
 
 on:
   push:
@@ -9,23 +8,76 @@ on:
 env:
   ARTIFACT_GROUP: "goa.systems"
   ARTIFACT_ID: "commons"
-  ARTIFACT_VERSION: "0.9.0-rc-${{ github.run_number }}"
+  ARTIFACT_VERSION: "0.10.0-rc"
+  DIST_SERVER: tools.goa.systems
+  DIST_USER: svcdeploy
 
 jobs:
+
   build-commons-lib:
-    runs-on: self-hosted
+
+    runs-on: build
+
+    env:
+        JAVAVERSION: 25.0.2
+        ZULUVERSION: 25.32.21
+        SONARVERSION: 8.0.1.6346
+        GRADLEVERSION: 9.3.1
+
     steps:
-      - name: Set permissions
-        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+
       - name: Checkout project
         uses: actions/checkout@v4
+
+      - name: Acquire key
+        run: |
+          if [ ! -d "${HOME}/.ssh" ]; then mkdir -p "${HOME}/.ssh"; fi
+          KEYFILE="${HOME}/.ssh/$(uuidgen)"
+          KNOWNHOSTSFILE="${HOME}/.ssh/$(uuidgen)"
+          echo "${{secrets.SSH_FOO_HETZNER}}" > "${KEYFILE}"
+          ssh-keyscan "${DIST_SERVER}" 1> "${KNOWNHOSTSFILE}" 2> /dev/null
+          chmod 600 "${KEYFILE}"
+          echo "KEYFILE=${KEYFILE}" >> $GITHUB_ENV
+          echo "KNOWNHOSTSFILE=${KNOWNHOSTSFILE}" >> $GITHUB_ENV
+
+      - name: Prepare Java
+        id: preparejava
+        run: |
+          APP_DIR="${HOME}/.local/programs/java"
+          JAVA_PACKAGE=zulu${ZULUVERSION}-ca-fx-jdk${JAVAVERSION}-linux_x64
+          JDK_DIR="${APP_DIR}/${JAVA_PACKAGE}"
+          if [ ! -d "${JDK_DIR}" ]
+          then
+              mkdir -p "${APP_DIR}"
+              wget -O "${HOME}/java.tar.gz" -q "https://cdn.azul.com/zulu/bin/${JAVA_PACKAGE}.tar.gz"
+              tar -x -f "${HOME}/java.tar.gz" -C "${APP_DIR}"
+              rm "${HOME}/java.tar.gz"
+          else
+              echo "Java already installed."
+          fi
+          echo "JAVA_HOME=${JDK_DIR}" >> $GITHUB_ENV
+
+      - name: Prepare Gradle
+        id: preparegradle
+        run: |
+          curl -s "https://raw.githubusercontent.com/goa-systems/automation/refs/heads/main/bash/gradle.sh" | bash -s
+
       - name: Build distribution
-        run: docker run --rm -v "$PWD":/home/gradle/project -w /home/gradle/project gradle:jdk17 gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
-      - name: Set permissions
-        run: docker run --rm -v "$PWD":/project bash:latest chown --recursive $(id -u):$(id -g) /project
+        run: |
+          PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${PATH}"
+          FULL_ARTIFACT_VERSION="${ARTIFACT_VERSION}-$(git rev-parse --short ${{ github.sha }})"
+          gradle -PARTIFACT_VERSION="${FULL_ARTIFACT_VERSION}" -PARTIFACT_GROUP="${ARTIFACT_GROUP}" -PARTIFACT_ID="${ARTIFACT_ID}" clean distribute
+          echo "FULL_ARTIFACT_VERSION=${FULL_ARTIFACT_VERSION}" >> $GITHUB_ENV
+
       - name: Publish artifact
         run: |
-          FILENAME=$ARTIFACT_ID-$ARTIFACT_VERSION.tar.gz
-          scp build/distributions/$FILENAME foo@tools.goa.systems:/tmp/$FILENAME
-          ssh foo@tools.goa.systems "bash -s" < ".github/scripts/deploymaven" "/tmp/$FILENAME" "$ARTIFACT_GROUP" "$ARTIFACT_ID" "$ARTIFACT_VERSION"
-          ssh foo@tools.goa.systems "rm /tmp/$FILENAME"
+          FILENAME=$ARTIFACT_ID-${FULL_ARTIFACT_VERSION}.tar.gz
+          scp -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} build/distributions/$FILENAME ${DIST_USER}@${DIST_SERVER}:/tmp/${FILENAME}
+          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "bash -s" < ".github/scripts/deploymaven" "/tmp/${FILENAME}" "${ARTIFACT_GROUP}" "${ARTIFACT_ID}" "${FULL_ARTIFACT_VERSION}"
+          ssh -i ${KEYFILE} -o UserKnownHostsFile=${KNOWNHOSTSFILE} ${DIST_USER}@${DIST_SERVER} "rm /tmp/${FILENAME}"
+
+      - name: Clean up
+        run: |
+          rm ${KEYFILE}
+          rm ${KNOWNHOSTSFILE}
+  

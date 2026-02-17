@@ -1,0 +1,5 @@
+CREATE TABLE a (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT,
+    "prename" TEXT
+);
