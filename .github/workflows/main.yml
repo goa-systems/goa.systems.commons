@@ -10,7 +10,7 @@ env:
   ARTIFACT_ID: "commons"
   ARTIFACT_VERSION: 0.10.0
   DIST_SERVER: tools.goa.systems
-  DIST_USER: foo
+  DIST_USER: svcdeploy
 
 jobs:
 
