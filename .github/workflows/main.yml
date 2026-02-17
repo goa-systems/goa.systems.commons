@@ -29,6 +29,17 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
+      - name: Acquire key
+        run: |
+          if [ ! -d "${HOME}/.ssh" ]; then mkdir -p "${HOME}/.ssh"; fi
+          KEYFILE="${HOME}/.ssh/$(uuidgen)"
+          KNOWNHOSTSFILE="${HOME}/.ssh/$(uuidgen)"
+          echo "${{secrets.SSH_FOO_HETZNER}}" > "${KEYFILE}"
+          ssh-keyscan "${DIST_SERVER}" 1> "${KNOWNHOSTSFILE}" 2> /dev/null
+          chmod 600 "${KEYFILE}"
+          echo "KEYFILE=${KEYFILE}" >> $GITHUB_ENV
+          echo "KNOWNHOSTSFILE=${KNOWNHOSTSFILE}" >> $GITHUB_ENV
+
       - name: Prepare Java
         id: preparejava
         run: |
