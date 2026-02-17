@@ -87,7 +87,7 @@ class MigratorTests {
 			SQLiteDataSource sqlds = new SQLiteDataSource();
 			sqlds.setUrl(sqliteurl);
 			Migrator m = new Migrator(sqlds);
-			assertEquals(null, m.determineDatabaseVersion());
+			assertEquals(null, m.determineDatabaseVersion().getVersion());
 			sqlitedb.delete();
 		});
 	}
