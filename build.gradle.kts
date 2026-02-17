@@ -69,7 +69,6 @@ tasks.register<Copy>("exportFromLocalRepo"){
     group = "build"
     description = "Exports from local Maven repository"
     
-    dependsOn(tasks.clean)
     dependsOn(tasks.get("publish" + artifactname.replaceFirstChar(Char::titlecase) + "PublicationTo" + localreponame + "Repository"))
     
     from(layout.buildDirectory.dir(repodir + "/" + project.getGroup().toString().replace(".", "/") + "/" + artifactname + "/" + version))
@@ -87,6 +86,7 @@ tasks.register<Tar>("distribute") {
     group = "build"
     description = "Creates tgz distribution."
     
+    dependsOn(tasks.build)
     dependsOn(tasks["exportFromLocalRepo"])
     
     from(layout.buildDirectory.dir("test"))

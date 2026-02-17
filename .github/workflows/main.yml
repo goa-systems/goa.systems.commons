@@ -83,7 +83,7 @@ jobs:
       - name: Build distribution
         run: |
           PATH="${JAVA_HOME}/bin:${GRADLE_HOME}/bin:${SONARQUBE_HOME}/bin:${PATH}"
-          gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean distribute
+          gradle -PARTIFACT_VERSION="$ARTIFACT_VERSION" -PARTIFACT_GROUP="$ARTIFACT_GROUP" -PARTIFACT_ID="$ARTIFACT_ID" clean build distribute
 
       - name: Analyze project
         run: | 
